@@ -1,0 +1,15 @@
+name: poc-yaml-example-com
+transport: http
+rules:
+    r1:
+        request:
+            method: GET
+            path: "/"
+        expression: |
+            response.status==200 && response.body.bcontains(b'Example Domain')
+expression:
+    r1()
+detail:
+    author: name(link)
+    links: 
+        - http://example.com
