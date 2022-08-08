@@ -7,10 +7,9 @@ import (
 )
 
 func main() {
-	fmt.Println("1")
 	poc, err := lib.LoadPoc("pocs/a.yaml")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(poc.Name)
+	fmt.Println(poc)
 }

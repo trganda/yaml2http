@@ -22,19 +22,13 @@ type RuleItem struct {
 }
 
 func (r *Rules) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var tmp1 yaml.MapSlice
 
-	if err := unmarshal(&tmp1); err != nil {
-		return err
-	}
-	var tmp = make(map[string][]Rules)
+	var tmp = make(map[string]Rule)
 	if err := unmarshal(&tmp); err != nil {
 		return err
 	}
 
-	for _, one := range tmp1 {
-		key := one.Key.(string)
-		value := tmp[key]
+	for key, value := range tmp {
 		*r = append(*r, RuleItem{key, value})
 	}
 	return nil
