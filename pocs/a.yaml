@@ -3,8 +3,9 @@ transport: http
 rules:
     r1:
         request:
-            method: GET
+            method: POST
             path: "/"
+            body: "a=b&b=a"
         expression: |
             response.status==200 && response.body.bcontains(b'Example Domain')
 expression: |
