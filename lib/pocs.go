@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v3"
@@ -10,7 +11,7 @@ type Poc struct {
 	Name       string `yaml:"name"`
 	Set        string `yaml:"set"`
 	Rules      Rules  `yaml:"rules"`
-	Expression string `yaml:"expressioin"`
+	Expression string `yaml:"expression"`
 	Detail     Detail `yaml:"detail"`
 }
 
@@ -53,8 +54,12 @@ type Detail struct {
 
 func LoadPoc(fileName string) (*Poc, error) {
 	p := &Poc{}
-	yamlFile, err := ioutil.ReadFile(fileName)
 
+	yamlFile, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 	err = yaml.Unmarshal(yamlFile, p)
 
 	return p, err

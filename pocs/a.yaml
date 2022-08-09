@@ -7,7 +7,7 @@ rules:
             path: "/"
         expression: |
             response.status==200 && response.body.bcontains(b'Example Domain')
-expression:
+expression: |
     r1()
 detail:
     author: name(link)
