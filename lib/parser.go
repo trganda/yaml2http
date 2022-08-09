@@ -3,6 +3,7 @@ package lib
 import (
 	"errors"
 	"fmt"
+	"net/http"
 )
 
 const (
@@ -44,9 +45,17 @@ func ToHttpRequest(poc *Poc) (*[]HttpRequest, error) {
 	headers["Connection"] = Connection
 	headers["Accept"] = Accept
 
+	variableMap := make(map[string]interface{})
+	defer func() {
+		variableMap = nil
+	}()
+
+	// Eval set
+	EvalSets(&poc.Set, variableMap)
+
 	for _, rule := range poc.Rules {
 		request := HttpRequest{}
-		req := rule.rule.Request
+		req := rule.Rule.Request
 		request.Method = req.Method
 		request.URI = req.Path
 		request.Version = "1.1"
@@ -58,16 +67,28 @@ func ToHttpRequest(poc *Poc) (*[]HttpRequest, error) {
 
 		request.Body = req.Body
 
-		// Calculate Content-Length
+		// Content-Length & Content-Type
 		if request.Method == MethodPost {
 			contentLength := fmt.Sprintf("%d", len(request.Body))
 			request.Headers["Content-Length"] = contentLength
+		}
+
+		if request.Body != "" {
+			buf := []byte(request.Body)
+			contentType := GetContentType(buf)
+			request.Headers["Content-Type"] = contentType
 		}
 
 		*requests = append(*requests, request)
 	}
 
 	return requests, nil
+}
+
+func GetContentType(buf []byte) string {
+	ret := http.DetectContentType(buf)
+
+	return ret
 }
 
 func (req *HttpRequest) ToHttpRequestText() (string, error) {
@@ -77,7 +98,12 @@ func (req *HttpRequest) ToHttpRequestText() (string, error) {
 	for hkey, hval := range req.Headers {
 		ret = ret + hkey + ": " + hval + "\r\n"
 	}
+
 	ret = ret + "\r\n"
+
+	if req.Method == MethodPost {
+		ret = ret + req.Body
+	}
 
 	return ret, nil
 }

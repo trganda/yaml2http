@@ -14,7 +14,7 @@ func main() {
 
 	poc, err := lib.LoadPoc(*path)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("[-] load poc file %s error. err: %v\n", *path, err)
 	}
 
 	requests, err := lib.ToHttpRequest(poc)

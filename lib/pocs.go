@@ -9,17 +9,37 @@ import (
 
 type Poc struct {
 	Name       string `yaml:"name"`
-	Set        string `yaml:"set"`
+	Set        Sets   `yaml:"set"`
 	Rules      Rules  `yaml:"rules"`
 	Expression string `yaml:"expression"`
 	Detail     Detail `yaml:"detail"`
 }
 
+type Sets []SetItem
 type Rules []RuleItem
 
+type SetItem struct {
+	Key   string
+	Value string
+}
+
 type RuleItem struct {
-	key  string
-	rule Rule
+	Key  string
+	Rule Rule
+}
+
+func (r *Sets) UnmarshalYAML(unmarshal func(interface{}) error) error {
+
+	var tmp = make(map[string]string)
+	if err := unmarshal(&tmp); err != nil {
+		return err
+	}
+
+	for key, value := range tmp {
+		*r = append(*r, SetItem{key, value})
+	}
+
+	return nil
 }
 
 func (r *Rules) UnmarshalYAML(unmarshal func(interface{}) error) error {
@@ -32,6 +52,7 @@ func (r *Rules) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	for key, value := range tmp {
 		*r = append(*r, RuleItem{key, value})
 	}
+
 	return nil
 }
 
