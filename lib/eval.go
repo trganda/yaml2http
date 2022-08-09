@@ -67,6 +67,7 @@ func NewEnvOption() CustomLib {
 	return c
 }
 
+// Refer to https://github.com/shadow1ng/fscan/blob/main/WebScan/lib/eval.go#L515
 func (c *CustomLib) UpdateCompileOptions(args Sets) {
 	for _, item := range args {
 		k, v := item.Key, item.Value
