@@ -1,6 +1,9 @@
 package lib
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 const (
 	MethodGet     = "GET"
@@ -48,10 +51,19 @@ func ToHttpRequest(poc *Poc) (*[]HttpRequest, error) {
 		request.URI = req.Path
 		request.Version = "1.1"
 		request.Headers = headers
+
 		for hkey, hvalue := range req.Headers {
 			request.Headers[hkey] = hvalue
 		}
+
 		request.Body = req.Body
+
+		// Calculate Content-Length
+		if request.Method == MethodPost {
+			contentLength := fmt.Sprintf("%d", len(request.Body))
+			request.Headers["Content-Length"] = contentLength
+		}
+
 		*requests = append(*requests, request)
 	}
 
