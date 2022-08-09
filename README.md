@@ -10,6 +10,20 @@
 go run main -path <path_to_yaml_poc>
 ```
 
+输出如下
+
+```http
+POST /index.jsp?c=898498081 HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.47
+Connection: close
+Accept: */*
+Content-Length: 7
+Content-Type: text/plain; charset=utf-8
+
+a=b&b=a
+```
+
 ## Todo
 
 * [X] 完成`yaml`解析，读取已支持字段值
