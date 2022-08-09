@@ -1,13 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"trganda.com/yaml2http/lib"
 )
 
 func main() {
-	poc, err := lib.LoadPoc("pocs/a.yaml")
+
+	path := flag.String("path", "", "path to poc file.")
+	flag.Parse()
+
+	poc, err := lib.LoadPoc(*path)
 	if err != nil {
 		fmt.Println(err)
 	}
