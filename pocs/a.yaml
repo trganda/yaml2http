@@ -7,7 +7,7 @@ rules:
     r1:
         request:
             method: POST
-            path: "/"
+            path: "/index.jsp?c={{r1}}"
             body: "a=b&b=a"
         expression: |
             response.status==200 && response.body.bcontains(b'Example Domain')

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -34,9 +35,12 @@ type HttpRequest struct {
 }
 
 func ToHttpRequest(poc *Poc) (*[]HttpRequest, error) {
+
+	err := errors.New("invalid argument")
 	if poc == nil {
-		return nil, errors.New("Invalid Argument")
+		return nil, err
 	}
+
 	requests := &[]HttpRequest{}
 
 	headers := make(map[string]string)
@@ -50,12 +54,31 @@ func ToHttpRequest(poc *Poc) (*[]HttpRequest, error) {
 		variableMap = nil
 	}()
 
-	// Eval set
+	// Eval sets
 	EvalSets(&poc.Set, variableMap)
 
-	for _, rule := range poc.Rules {
-		request := HttpRequest{}
+	DealWithRule := func(rule RuleItem) HttpRequest {
 		req := rule.Rule.Request
+
+		for k, val := range variableMap {
+			_, isMap := val.(map[string]string)
+			if isMap {
+				continue
+			}
+
+			val := fmt.Sprintf("%v", val)
+			req.Path = strings.ReplaceAll(req.Path, "{{"+k+"}}", val)
+			req.Body = strings.ReplaceAll(req.Body, "{{"+k+"}}", val)
+
+			for headerName, headerVal := range req.Headers {
+				if !strings.Contains(headerVal, "{{"+k+"}}") {
+					continue
+				}
+				req.Headers[headerName] = strings.ReplaceAll(headerVal, "{{"+k+"}}", val)
+			}
+		}
+
+		request := HttpRequest{}
 		request.Method = req.Method
 		request.URI = req.Path
 		request.Version = "1.1"
@@ -79,8 +102,17 @@ func ToHttpRequest(poc *Poc) (*[]HttpRequest, error) {
 			request.Headers["Content-Type"] = contentType
 		}
 
-		*requests = append(*requests, request)
+		return request
 	}
+
+	DealWithRules := func(rules Rules) {
+		for _, rule := range rules {
+			request := DealWithRule(rule)
+			*requests = append(*requests, request)
+		}
+	}
+
+	DealWithRules(poc.Rules)
 
 	return requests, nil
 }
