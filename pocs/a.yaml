@@ -3,11 +3,12 @@ transport: http
 set:
     r1: randomInt(800000000, 1000000000)
     r2: randomInt(800000000, 1000000000)
+    r3: base64(string(r1))
 rules:
     r1:
         request:
             method: POST
-            path: "/index.jsp?c={{r1}}"
+            path: "/index.jsp?c={{r3}}"
             body: "a=b&b=a"
         expression: |
             response.status==200 && response.body.bcontains(b'Example Domain')
