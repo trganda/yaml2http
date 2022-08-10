@@ -42,8 +42,6 @@ func NewEnvOption() CustomLib {
 		cel.Container("yamlctx"),
 		cel.Declarations(
 			// Custom functions
-			decls.NewFunction("randomInt",
-				decls.NewOverload("randomInt_int_int", []*exprpb.Type{decls.Int, decls.Int}, decls.Int)),
 			decls.NewFunction("md5",
 				decls.NewOverload("md5_string", []*exprpb.Type{decls.String}, decls.String)),
 			decls.NewFunction("base64",
@@ -65,13 +63,9 @@ func NewEnvOption() CustomLib {
 			decls.NewFunction("substr",
 				decls.NewOverload("substr_string_int_int", []*exprpb.Type{decls.String, decls.Int, decls.Int}, decls.String)),
 		),
-	}
-
-	c.programOptions = []cel.ProgramOption{
-		cel.Functions(
-			&functions.Overload{
-				Operator: "randomInt_int_int",
-				Binary: func(lhs ref.Val, rhs ref.Val) ref.Val {
+		cel.Function("randomInt",
+			cel.Overload("randomInt_int_int", []*cel.Type{cel.IntType, cel.IntType}, cel.IntType,
+				cel.BinaryBinding(func(lhs, rhs ref.Val) ref.Val {
 					from, ok := lhs.(types.Int)
 					if !ok {
 						return types.ValOrErr(lhs, "unexpected type '%v' passed to randomInt", lhs.Type())
@@ -82,8 +76,13 @@ func NewEnvOption() CustomLib {
 					}
 					min, max := int(from), int(to)
 					return types.Int(rand.Intn(max-min) + min)
-				},
-			},
+				}),
+			),
+		),
+	}
+
+	c.programOptions = []cel.ProgramOption{
+		cel.Functions(
 			&functions.Overload{
 				Operator: "md5_string",
 				Unary: func(value ref.Val) ref.Val {
