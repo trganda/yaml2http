@@ -12,7 +12,6 @@ import (
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
-	"github.com/google/cel-go/interpreter/functions"
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
 )
 
@@ -40,29 +39,6 @@ func NewEnvOption() CustomLib {
 
 	c.envOptions = []cel.EnvOption{
 		cel.Container("yamlctx"),
-		cel.Declarations(
-			// Custom functions
-			decls.NewFunction("md5",
-				decls.NewOverload("md5_string", []*exprpb.Type{decls.String}, decls.String)),
-			decls.NewFunction("base64",
-				decls.NewOverload("base64_string", []*exprpb.Type{decls.String}, decls.String)),
-			decls.NewFunction("base64",
-				decls.NewOverload("base64_bytes", []*exprpb.Type{decls.Bytes}, decls.String)),
-			decls.NewFunction("base64Decode",
-				decls.NewOverload("base64Decode_string", []*exprpb.Type{decls.String}, decls.String)),
-			decls.NewFunction("base64Decode",
-				decls.NewOverload("base64Decode_bytes", []*exprpb.Type{decls.Bytes}, decls.String)),
-			decls.NewFunction("urlencode",
-				decls.NewOverload("urlencode_string", []*exprpb.Type{decls.String}, decls.String)),
-			decls.NewFunction("urlencode",
-				decls.NewOverload("urlencode_bytes", []*exprpb.Type{decls.Bytes}, decls.String)),
-			decls.NewFunction("urldecode",
-				decls.NewOverload("urldecode_string", []*exprpb.Type{decls.String}, decls.String)),
-			decls.NewFunction("urldecode",
-				decls.NewOverload("urldecode_bytes", []*exprpb.Type{decls.Bytes}, decls.String)),
-			decls.NewFunction("substr",
-				decls.NewOverload("substr_string_int_int", []*exprpb.Type{decls.String, decls.Int, decls.Int}, decls.String)),
-		),
 		cel.Function("randomInt",
 			cel.Overload("randomInt_int_int", []*cel.Type{cel.IntType, cel.IntType}, cel.IntType,
 				cel.BinaryBinding(func(lhs, rhs ref.Val) ref.Val {
@@ -79,119 +55,135 @@ func NewEnvOption() CustomLib {
 				}),
 			),
 		),
-	}
+		cel.Function("md5",
+			cel.Overload("md5_string", []*cel.Type{cel.StringType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.String)
+					if !ok {
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
+					}
 
-	c.programOptions = []cel.ProgramOption{
-		cel.Functions(
-			&functions.Overload{
-				Operator: "md5_string",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.String)
+					return types.String(fmt.Sprintf("%x", md5.Sum([]byte(val))))
+				}),
+			),
+		),
+		cel.Function("base64",
+			cel.Overload("base64_string", []*cel.Type{cel.StringType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.String)
 					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to md5_string", value.Type())
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
 					}
-					return types.String(fmt.Sprintf("%x", md5.Sum([]byte(v))))
-				},
-			},
-			&functions.Overload{
-				Operator: "base64_string",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.String)
+
+					return types.String(base64.StdEncoding.EncodeToString([]byte(val)))
+				}),
+			),
+		),
+		cel.Function("base64",
+			cel.Overload("base64_bytes", []*cel.Type{cel.BytesType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.Bytes)
 					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to base64_string", value.Type())
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
 					}
-					return types.String(base64.StdEncoding.EncodeToString([]byte(v)))
-				},
-			},
-			&functions.Overload{
-				Operator: "base64_bytes",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.Bytes)
+
+					return types.String(base64.StdEncoding.EncodeToString(val))
+				}),
+			),
+		),
+		cel.Function("base64Decode",
+			cel.Overload("base64Decode_string", []*cel.Type{cel.StringType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.String)
 					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to base64_bytes", value.Type())
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
 					}
-					return types.String(base64.StdEncoding.EncodeToString(v))
-				},
-			},
-			&functions.Overload{
-				Operator: "base64Decode_string",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.String)
-					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to base64Decode_string", value.Type())
-					}
-					decodeBytes, err := base64.StdEncoding.DecodeString(string(v))
+
+					decodedBytes, err := base64.StdEncoding.DecodeString(string(val))
 					if err != nil {
 						return types.NewErr("%v", err)
 					}
-					return types.String(decodeBytes)
-				},
-			},
-			&functions.Overload{
-				Operator: "base64Decode_bytes",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.Bytes)
+
+					return types.String(decodedBytes)
+				}),
+			),
+		),
+		cel.Function("base64Decode",
+			cel.Overload("base64Decode_bytes", []*cel.Type{cel.BytesType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.Bytes)
 					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to base64Decode_bytes", value.Type())
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
 					}
-					decodeBytes, err := base64.StdEncoding.DecodeString(string(v))
+
+					decodedBytes, err := base64.StdEncoding.DecodeString(string(val))
 					if err != nil {
 						return types.NewErr("%v", err)
 					}
-					return types.String(decodeBytes)
-				},
-			},
-			&functions.Overload{
-				Operator: "urlencode_string",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.String)
+
+					return types.String(decodedBytes)
+				}),
+			),
+		),
+		cel.Function("urlencode",
+			cel.Overload("urlencode_string", []*cel.Type{cel.StringType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.String)
 					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to urlencode_string", value.Type())
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
 					}
-					return types.String(url.QueryEscape(string(v)))
-				},
-			},
-			&functions.Overload{
-				Operator: "urlencode_bytes",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.Bytes)
+
+					return types.String(url.QueryEscape(string(val)))
+				}),
+			),
+		),
+		cel.Function("urlencode",
+			cel.Overload("urlencode_bytes", []*cel.Type{cel.BytesType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.Bytes)
 					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to urlencode_bytes", value.Type())
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
 					}
-					return types.String(url.QueryEscape(string(v)))
-				},
-			},
-			&functions.Overload{
-				Operator: "urldecode_string",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.String)
+
+					return types.String(url.QueryEscape(string(val)))
+				}),
+			),
+		),
+		cel.Function("urldecode",
+			cel.Overload("urldecode_string", []*cel.Type{cel.StringType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.String)
 					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to urldecode_string", value.Type())
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
 					}
-					decodeString, err := url.QueryUnescape(string(v))
-					if err != nil {
-						return types.NewErr("%v", err)
-					}
-					return types.String(decodeString)
-				},
-			},
-			&functions.Overload{
-				Operator: "urldecode_bytes",
-				Unary: func(value ref.Val) ref.Val {
-					v, ok := value.(types.Bytes)
-					if !ok {
-						return types.ValOrErr(value, "unexpected type '%v' passed to urldecode_bytes", value.Type())
-					}
-					decodeString, err := url.QueryUnescape(string(v))
+
+					decodeString, err := url.QueryUnescape(string(val))
 					if err != nil {
 						return types.NewErr("%v", err)
 					}
 					return types.String(decodeString)
-				},
-			},
-			&functions.Overload{
-				Operator: "substr_string_int_int",
-				Function: func(values ...ref.Val) ref.Val {
+				}),
+			),
+		),
+		cel.Function("urldecode",
+			cel.Overload("urldecode_bytes", []*cel.Type{cel.BytesType}, cel.StringType,
+				cel.UnaryBinding(func(value ref.Val) ref.Val {
+					val, ok := value.(types.Bytes)
+					if !ok {
+						return types.ValOrErr(val, "unexpected type '%v'", val.Type())
+					}
+
+					decodeString, err := url.QueryUnescape(string(val))
+					if err != nil {
+						return types.NewErr("%v", err)
+					}
+					return types.String(decodeString)
+				}),
+			),
+		),
+		cel.Function("substr",
+			cel.Overload("substr_string_int_int", []*cel.Type{cel.StringType, cel.IntType, cel.IntType}, cel.StringType,
+				cel.FunctionBinding(func(values ...ref.Val) ref.Val {
 					if len(values) == 3 {
 						str, ok := values[0].(types.String)
 						if !ok {
@@ -213,10 +205,12 @@ func NewEnvOption() CustomLib {
 					} else {
 						return types.NewErr("too many arguments to 'substr'")
 					}
-				},
-			},
+				}),
+			),
 		),
 	}
+
+	c.programOptions = []cel.ProgramOption{}
 
 	return c
 }
