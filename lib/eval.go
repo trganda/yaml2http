@@ -41,6 +41,26 @@ func NewEnvOption() CustomLib {
 			// Custom functions
 			decls.NewFunction("randomInt",
 				decls.NewOverload("randomInt_int_int", []*exprpb.Type{decls.Int, decls.Int}, decls.Int)),
+			decls.NewFunction("md5",
+			    decls.NewOverload("md5_string", []*exprpb.Type{decls.String}, decls.String)),
+			decls.NewFunction("base64",
+			    decls.NewOverload("base64_string", []*exprpb.Type{decls.String}, decls.String)),
+			decls.NewFunction("base64",
+				decls.NewOverload("base64_bytes", []*exprpb.Type{decls.Bytes}, decls.String)),
+			decls.NewFunction("base64Decode",
+				decls.NewOverload("base64Decode_string", []*exprpb.Type{decls.String}, decls.String)),
+			decls.NewFunction("base64Decode",
+				decls.NewOverload("base64Decode_bytes", []*exprpb.Type{decls.Bytes}, decls.String)),
+			decls.NewFunction("urlencode",
+				decls.NewOverload("urlencode_string", []*exprpb.Type{decls.String}, decls.String)),
+			decls.NewFunction("urlencode",
+				decls.NewOverload("urlencode_bytes", []*exprpb.Type{decls.Bytes}, decls.String)),
+			decls.NewFunction("urldecode",
+				decls.NewOverload("urldecode_string", []*exprpb.Type{decls.String}, decls.String)),
+			decls.NewFunction("urldecode",
+				decls.NewOverload("urldecode_bytes", []*exprpb.Type{decls.String}, decls.String)),
+			decls.NewFunction("substr",
+				decls.NewOverload("substr_string_int_int", []*exprpb.Type{decls.String, decls.Int, decls.Int}, decls.String)),
 		),
 	}
 
@@ -59,6 +79,16 @@ func NewEnvOption() CustomLib {
 					}
 					min, max := int(from), int(to)
 					return types.Int(rand.Intn(max-min) + min)
+				},
+			},
+			&functions.Overload{
+				Operator: "md5_string",
+				Unary: func(value ref.Val) ref.Val {
+					v, ok := value.(types.String)
+					if !ok {
+						return type.ValOrErr(value, "unexpected type '%v' passed to md5_string", value.Type())
+					}
+					return types.String(fmt.Sprintf("%x", md5.Sum([]byte(v))))
 				},
 			},
 		),
