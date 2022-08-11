@@ -101,5 +101,21 @@ expression: |
 
 `expression`使用[Common Expression Language (CEL)](https://github.com/google/cel-spec)表达式语法，类似于`spel`或`ognl`，用于在`golang`中执行语句。
 
+除了`cel`自带的函数，当前还支持一下函数
 
+#### 字符串处理
 
+| **函数名** | **函数原型** | **说明** |
+|---------| --- | --- |
+| substr | func substr(string, start int, length int) string | 截取字符串 |
+
+#### 编码加密函数
+
+| **函数名** | **函数原型** | **说明** |
+|---------| --- |----------------------------|
+| substr | func substr(string, start int, length int) string | 截取字符串  |
+| md5 | func md5(string) string	| 字符串的 md5                   |
+| base64 | func base64(string/bytes) string | 将字符串或 bytes 进行 base64 编码   |
+| base64Decode | func base64Decode(string/bytes) string | 将字符串或 bytes 进行 base64 解码   |
+| urlencode | func urlencode(string/bytes) string | 将字符串或 bytes 进行 urlencode 编码 |
+| urldecode | func urldecode(string/bytes) string | 将字符串或 bytes 进行 urldecode 解码 |

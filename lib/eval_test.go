@@ -37,7 +37,7 @@ func TestMd5(t *testing.T) {
 		variableMap = nil
 	}()
 
-	out, _ := lib.Evaluate(env, "md5(\"dsfsdf\")", variableMap)
+	out, _ := lib.Evaluate(env, `md5("dsfsdf")`, variableMap)
 	outs := fmt.Sprintf("%v", out)
 
 	if !reflect.DeepEqual(outs, want) {
@@ -56,7 +56,7 @@ func TestBase64String(t *testing.T) {
 		variableMap = nil
 	}()
 
-	out, _ := lib.Evaluate(env, "base64(\"dsfsdf\")", variableMap)
+	out, _ := lib.Evaluate(env, `base64("dsfsdf")`, variableMap)
 	outs := fmt.Sprintf("%v", out)
 
 	if !reflect.DeepEqual(outs, want) {
