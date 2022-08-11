@@ -113,7 +113,6 @@ expression: |
 
 | **函数名** | **函数原型** | **说明** |
 |---------| --- |----------------------------|
-| substr | func substr(string, start int, length int) string | 截取字符串  |
 | md5 | func md5(string) string	| 字符串的 md5                   |
 | base64 | func base64(string/bytes) string | 将字符串或 bytes 进行 base64 编码   |
 | base64Decode | func base64Decode(string/bytes) string | 将字符串或 bytes 进行 base64 解码   |
