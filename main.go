@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"log"
 
 	"trganda.com/yaml2http/lib"
 )
@@ -14,18 +14,18 @@ func main() {
 
 	poc, err := lib.LoadPoc(*path)
 	if err != nil {
-		fmt.Printf("[-] load poc file %s error. err: %v\n", *path, err)
+		log.Fatalf("[-] loading poc file %s error. err: %v\n", *path, err)
 	}
 
 	requests, err := lib.ToHttpRequest(poc)
 	if err != nil {
-		fmt.Printf("[-] convert to http request failed. err: %v\n", err)
+		log.Fatalf("[-] convert to http request failed. err: %v\n", err)
 	}
 	for _, request := range *requests {
 		str, err := request.ToHttpRequestText()
 		if err != nil {
-			fmt.Printf("[-] generate http request text failed. err %v\n", err)
+			log.Fatalf("[-] generate http request text failed. err %v\n", err)
 		}
-		fmt.Println(str)
+		log.Printf("[+] generated\n%v\n", str)
 	}
 }

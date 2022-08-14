@@ -26,6 +26,8 @@ const (
 	Accept     = "*/*"
 )
 
+var InvalidArgument = errors.New("invalid argument")
+
 type HttpRequest struct {
 	Method  string
 	URI     string
@@ -36,9 +38,8 @@ type HttpRequest struct {
 
 func ToHttpRequest(poc *Poc) (*[]HttpRequest, error) {
 
-	err := errors.New("invalid argument")
 	if poc == nil {
-		return nil, err
+		return nil, InvalidArgument
 	}
 
 	requests := &[]HttpRequest{}
@@ -55,7 +56,10 @@ func ToHttpRequest(poc *Poc) (*[]HttpRequest, error) {
 	}()
 
 	// Eval sets
-	EvalSets(&poc.Set, variableMap)
+	err := EvalSets(&poc.Set, variableMap)
+	if err != nil {
+		return nil, err
+	}
 
 	DealWithRule := func(rule RuleItem) HttpRequest {
 		req := rule.Rule.Request
