@@ -4,15 +4,14 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"fmt"
-	"math/rand"
-	"net/url"
-	"strings"
-
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
+	"math/rand"
+	"net/url"
+	"strings"
 )
 
 type CustomLib struct {
@@ -215,12 +214,14 @@ func NewEnvOption() CustomLib {
 	return c
 }
 
-// Refer to https://github.com/shadow1ng/fscan/blob/main/WebScan/lib/eval.go#L515
+// UpdateCompileOptions
+/**
+ * Convert argument type to approve type.
+ * Refer to https://github.com/shadow1ng/fscan/blob/main/WebScan/lib/eval.go#L515
+ */
 func (c *CustomLib) UpdateCompileOptions(args Sets) {
 	for _, item := range args {
 		k, v := item.Key, item.Value
-		// 在执行之前是不知道变量的类型的，所以统一声明为字符型
-		// 所以randomInt虽然返回的是int型，在运算中却被当作字符型进行计算，需要重载string_*_string
 		var d *exprpb.Decl
 		if strings.HasPrefix(v, "randomInt") {
 			d = decls.NewConst(k, decls.Int, nil)
@@ -232,6 +233,10 @@ func (c *CustomLib) UpdateCompileOptions(args Sets) {
 	}
 }
 
+// Evaluate
+/**
+ * Eval the expression with context env and parameter params.
+ */
 func Evaluate(env *cel.Env, expression string, params map[string]interface{}) (ref.Val, error) {
 	ast, iss := env.Compile(expression)
 	if iss.Err() != nil {
