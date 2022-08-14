@@ -101,7 +101,7 @@ expression: |
 
 `expression`使用[Common Expression Language (CEL)](https://github.com/google/cel-spec)表达式语法，类似于`spel`或`ognl`，用于在`golang`中执行语句。
 
-除了`cel`自带的函数，当前还支持一下函数
+除了`cel`自带的函数，当前还支持以下函数
 
 #### 字符串处理
 
