@@ -29,8 +29,7 @@ public class PocsParser {
 
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(Sets.class, new SetJsonDeserializer());
-        simpleModule.addDeserializer(Rules.class, new RuleDeserializer());
-        simpleModule.addDeserializer(Rules.RuleItem.class, new RuleItemDeserializer());
+        simpleModule.addDeserializer(Rules.class, new RulesDeserializer());
 
         mapper.registerModule(simpleModule);
         mapper.findAndRegisterModules();
@@ -50,13 +49,17 @@ public class PocsParser {
 
         List<HttpRequest> httpRequests = new ArrayList<>();
 
-        for (Map.Entry<String, Rules.RuleItem> ruleItemEntry : pocs.rules.ruleItems.entrySet()) {
+        for (Map.Entry<String, Rules.RuleItem> ruleItemEntry : pocs.rules.rules.entrySet()) {
             Rules.Request req = ruleItemEntry.getValue().request;
             Map<String, String> theader = defaultHeader;
 
             for (Map.Entry<String, String> val : valMap.entrySet()) {
                 req.path = req.path.replaceAll("\\{\\{" + val.getKey() + "}}", val.getValue());
                 req.body = req.body.replaceAll("\\{\\{" + val.getKey() + "}}", val.getValue());
+
+                if (req.headers == null) {
+                    continue;
+                }
 
                 for (Map.Entry<String, String> header : req.headers.entrySet()) {
                     if (!header.getValue().contains("{{" + val.getKey() + "}}")) {

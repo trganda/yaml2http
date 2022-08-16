@@ -1,10 +1,11 @@
 package com.github.trganda.pocs;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Rules {
 
-    public Map<String, RuleItem> ruleItems;
+    public Map<String, RuleItem> rules;
 
     public static class RuleItem {
         public Request request;
@@ -22,7 +23,7 @@ public class Rules {
     public static class Request {
         public String method;
         public String path;
-        public Map<String, String> headers;
+        public Map<String, String> headers = new LinkedHashMap<>();
         public String body;
 
         @Override
@@ -39,7 +40,7 @@ public class Rules {
     @Override
     public String toString() {
         return "Rules{" +
-                "ruleItems=" + ruleItems +
+                "rules=" + rules +
                 '}';
     }
 }
