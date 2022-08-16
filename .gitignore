@@ -1,2 +1,9 @@
-# IDEA
-.gitignore/
+# Idea
+.idea/
+
+# vscode
+.vscode/
+
+target/
+*.class
+*.jar
