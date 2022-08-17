@@ -2,6 +2,7 @@ package com.github.trganda.eval;
 
 import com.github.trganda.functions.GlobalMethodResolver;
 import com.github.trganda.pocs.Sets;
+import com.github.trganda.util.Util;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -9,6 +10,8 @@ import org.springframework.expression.spel.support.SimpleEvaluationContext;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Evaluation {
     private final ExpressionParser parser;
@@ -44,6 +47,15 @@ public class Evaluation {
     }
 
     private String prepare(String expression) {
+        String bStrPattern = "b(\".*?\")";
+        Pattern pattern = Pattern.compile(bStrPattern);
+
+        Matcher matcher = pattern.matcher(expression);
+
+        if (matcher.find()) {
+            return Util.hex2Unicode(matcher.group(1));
+        }
+
         return expression;
     }
 }
