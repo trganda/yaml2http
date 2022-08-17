@@ -4,6 +4,7 @@ import burp.IBurpExtenderCallbacks;
 import com.github.trganda.parser.HttpRequest;
 import com.github.trganda.parser.PocsParser;
 import com.github.trganda.pocs.Pocs;
+import com.github.trganda.util.Util;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -37,7 +38,7 @@ public class ImportActionListener implements ActionListener {
 
                     for (HttpRequest httpRequest : httpRequestList) {
                         callbacks.sendToRepeater("localhost", 80, false,
-                                httpRequest.toString().getBytes(StandardCharsets.UTF_8), pocs.name);
+                                Util.getBytes(httpRequest.toString()), pocs.name);
                     }
 
 

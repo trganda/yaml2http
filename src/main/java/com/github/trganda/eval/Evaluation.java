@@ -33,6 +33,11 @@ public class Evaluation {
         return parser.parseExpression(expression).getValue(context, "", String.class);
     }
 
+    /**
+     * Eval each value of sets with spel.
+     * @param sets, the variable that need to be eval.
+     * @return evaluated result.
+     */
     public Map<String, String> evalSet(Sets sets) {
 
         Map<String, String> ret = new LinkedHashMap<>();
@@ -46,14 +51,21 @@ public class Evaluation {
         return ret;
     }
 
+    /**
+     * Convert the byte string of golang to a java String
+     * @param expression, raw golang byte string.
+     * @return converted java string.
+     */
     private String prepare(String expression) {
         String bStrPattern = "b(\".*?\")";
         Pattern pattern = Pattern.compile(bStrPattern);
 
         Matcher matcher = pattern.matcher(expression);
 
-        if (matcher.find()) {
-            return Util.hex2Unicode(matcher.group(1));
+        int matcher_start = 0;
+        while (matcher.find(matcher_start)){
+            expression = expression.replace(matcher.group(0), Util.hex2Unicode(matcher.group(1)));
+            matcher_start = matcher.end();
         }
 
         return expression;

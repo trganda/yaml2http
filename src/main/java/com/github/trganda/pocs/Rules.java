@@ -21,10 +21,10 @@ public class Rules {
     }
 
     public static class Request {
-        public String method;
-        public String path;
+        public String method = "";
+        public String path = "";
         public Map<String, String> headers = new LinkedHashMap<>();
-        public String body;
+        public String body = "";
 
         @Override
         public String toString() {

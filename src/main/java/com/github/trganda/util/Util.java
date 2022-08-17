@@ -16,4 +16,15 @@ public class Util {
         return expression;
     }
 
+    public static byte[] getBytes(String expression) {
+        char[] buffer = expression.toCharArray();
+        byte[] bytes = new byte[buffer.length];
+
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte)(buffer[i] & 0x00FF);
+        }
+
+        return bytes;
+    }
+
 }

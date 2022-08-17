@@ -10,7 +10,10 @@ public class GlobalMethodResolver extends ReflectiveMethodResolver {
     protected Method[] getMethods(Class<?> type) {
         try {
             return new Method[] {
-                    Functions.class.getDeclaredMethod("randomInt", Integer.TYPE, Integer.TYPE)};
+                    Functions.class.getDeclaredMethod("randomInt", Integer.TYPE, Integer.TYPE),
+                    Functions.class.getDeclaredMethod("base64", String.class),
+                    Functions.class.getDeclaredMethod("md5", String.class),
+            };
         }
         catch (NoSuchMethodException ex) {
             return new Method[0];
