@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * 	Body    string
  * }
  */
-public class HttpRequest {
+public final class HttpRequest {
 
     public static Map<String, String> defaultHeader =
             Stream.of(
@@ -25,11 +25,11 @@ public class HttpRequest {
                     new AbstractMap.SimpleEntry<>("Accept", "*/*")).
                     collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
-    private String method;
-    private String uri;
-    private String version;
-    private Map<String, String> headers;
-    private String body;
+    private final String method;
+    private final String uri;
+    private final String version;
+    private final Map<String, String> headers;
+    private final String body;
 
     public HttpRequest(String method, String uri,
                        String version, Map<String, String> headers, String body) {
@@ -42,12 +42,18 @@ public class HttpRequest {
 
     @Override
     public String toString() {
-        return "HttpRequest{" +
-                "method='" + method + '\'' +
-                ", uri='" + uri + '\'' +
-                ", version='" + version + '\'' +
-                ", headers=" + headers +
-                ", body='" + body + '\'' +
-                '}';
+
+        StringBuilder requestString = new StringBuilder();
+        requestString.append(method).append(" ").append(uri).append(" HTTP/").append(version).append("\n");
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            requestString.append(header.getKey()).append(": ").append(header.getValue()).append("\n");
+        }
+        requestString.append("\n");
+        if (body != null && !body.isEmpty()) {
+            requestString.append(body).append("\n");
+        }
+        requestString.append("\n");
+
+        return requestString.toString();
     }
 }

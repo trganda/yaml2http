@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.github.trganda.parser.HttpRequest.defaultHeader;
 
@@ -52,7 +53,7 @@ public class PocsParser {
         for (Map.Entry<String, Rules.RuleItem> ruleItemEntry : pocs.rules.rules.entrySet()) {
             Rules.Request req = ruleItemEntry.getValue().request;
             Map<String, String> theader = defaultHeader;
-
+            // For each set variable value
             for (Map.Entry<String, String> val : valMap.entrySet()) {
                 req.path = req.path.replaceAll("\\{\\{" + val.getKey() + "}}", val.getValue());
                 req.body = req.body.replaceAll("\\{\\{" + val.getKey() + "}}", val.getValue());
@@ -67,6 +68,12 @@ public class PocsParser {
                     }
                     header.setValue(header.getValue().replaceAll("\\{\\{" + val.getKey() + "}}", val.getValue()));
                 }
+            }
+
+            assert req.headers != null;
+            if (Objects.equals(req.method, "POST") && (req.body != null || !req.body.isEmpty())) {
+                long contentLength = req.body.length();
+                req.headers.put("Content-Length", String.valueOf(contentLength));
             }
 
             theader.putAll(req.headers);

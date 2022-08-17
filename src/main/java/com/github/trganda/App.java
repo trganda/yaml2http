@@ -1,6 +1,5 @@
 package com.github.trganda;
 
-import com.github.trganda.eval.Evaluation;
 import com.github.trganda.parser.HttpRequest;
 import com.github.trganda.parser.PocsParser;
 import com.github.trganda.pocs.*;
@@ -8,7 +7,6 @@ import com.github.trganda.pocs.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 public class App {
 
@@ -18,6 +16,9 @@ public class App {
         Pocs pocs = parser.readPocs();
         List<HttpRequest> httpRequestList = parser.toHttpRequests(pocs);
 
-        System.out.println(httpRequestList.toString());
+        for (HttpRequest httpRequest : httpRequestList) {
+            System.out.println(httpRequest);
+        }
+
     }
 }
