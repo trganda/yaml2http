@@ -2,12 +2,16 @@ package com.github.trganda.eval;
 
 import com.github.trganda.functions.GlobalMethodResolver;
 import com.github.trganda.pocs.Sets;
+import com.github.trganda.util.CelBytesInputStream;
 import com.github.trganda.util.Util;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -64,8 +68,17 @@ public class Evaluation {
 
         int matcher_start = 0;
         while (matcher.find(matcher_start)){
-            expression = expression.replace(matcher.group(0), Util.hex2Unicode(matcher.group(1)));
-            matcher_start = matcher.end();
+            ByteArrayInputStream bis = new ByteArrayInputStream(matcher.group(0).getBytes(StandardCharsets.UTF_8));
+
+            try {
+                CelBytesInputStream celBytesInputStream = new CelBytesInputStream(bis);
+                celBytesInputStream.process();
+
+                expression = expression.replace(matcher.group(0), celBytesInputStream.getBufString());
+                matcher_start = matcher.end();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
 
         return expression;

@@ -1,7 +1,7 @@
 package com.github.trganda.util;
 
-import static com.github.trganda.util.CelBytesInputStream.CEL_ASCII_LOWA;
-import static com.github.trganda.util.CelBytesInputStream.CEL_OCTET_ZERO;
+import static com.github.trganda.util.CelBytesConstants.CEL_BYTE_LOW_A;
+import static com.github.trganda.util.CelBytesConstants.CEL_BYTE_ZERO;
 
 public class Util {
 
@@ -30,6 +30,15 @@ public class Util {
         return bytes;
     }
 
+    public static String bytes2String(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append((char)(b & 0x00FF));
+        }
+        return sb.toString();
+    }
+
+
     public static boolean isAsciiByte(byte ascii) {
         return ascii >= 0x00;
     }
@@ -49,10 +58,11 @@ public class Util {
 
     public static byte toHexValue(byte ascii) {
         if (Util.isHexAscii(ascii)) {
+            ascii = Util.toLowerCase(ascii);
             if (Util.isDigit(ascii)) {
-                ascii = (byte) (ascii - CEL_OCTET_ZERO);
+                ascii = (byte) (ascii - CEL_BYTE_ZERO);
             } else {
-                ascii = (byte) (ascii - CEL_ASCII_LOWA);
+                ascii = (byte) (ascii - CEL_BYTE_LOW_A + 10);
             }
             return ascii;
         }

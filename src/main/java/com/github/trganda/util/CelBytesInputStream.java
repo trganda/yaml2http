@@ -3,7 +3,10 @@ package com.github.trganda.util;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+
+import static com.github.trganda.util.CelBytesConstants.*;
 
 /**
  * CelByteString was used to process the
@@ -14,39 +17,6 @@ public class CelBytesInputStream extends InputStream {
 
     private final ArrayList<Byte> buf;
     private final PeekInputStream in;
-
-    /**
-     * Start of the byte array, character 'b'.
-     */
-    final static byte CEL_BYTE_START = (byte)0x62;
-
-    /**
-     * Quote of the byte array, character '"'.
-     */
-    final static byte CEL_BYTE_QUOTE = (byte)0x22;
-
-    /**
-     * Escape of the byte array, character '\'.
-     */
-    final static byte CEL_BYTE_SLASH = (byte)0x5C;
-
-    /**
-     * Hex data of the byte array, upper character 'X'.
-     */
-    final static byte CEL_BYTE_UPHEX = (byte)0x58;
-
-    /**
-     * Hex of the byte array, lower character 'x'.
-     */
-    final static byte CEL_BYTE_LWHEX = (byte)0x78;
-
-    final static byte CEL_ASCII_LOWA = (byte)0x61;
-
-    final static byte CEL_OCTET_ZERO = (byte)0x30;
-
-    final static byte CEL_OCTET_THREE = (byte)0x33;
-
-    final static byte CEL_OCTET_SEVEN = (byte)0x37;
 
     public CelBytesInputStream(InputStream in) {
         buf = new ArrayList<>();
@@ -66,12 +36,13 @@ public class CelBytesInputStream extends InputStream {
 
         buf.add(cel);
         while (in.available() > 0) {
-            cel = in.readByte();
+            cel = in.peekByte();
             switch (cel) {
                 case CEL_BYTE_SLASH:
-                    readHex();
+                    readSlash();
                     break;
                 case CEL_BYTE_QUOTE:
+                    cel = in.readByte();
                     buf.add(cel);
                     break;
                 default:
@@ -79,47 +50,112 @@ public class CelBytesInputStream extends InputStream {
                     break;
             }
         }
-
-
     }
 
-    public ArrayList<Byte> getBuf() {
-        return buf;
+    public byte[] getByteBuf() {
+        byte[] ret = new byte[buf.size()];
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = buf.get(i);
+        }
+        return ret;
+    }
+
+    public String getBufString() {
+        byte[] bytes = getByteBuf();
+        return Util.bytes2String(bytes);
     }
 
     private void readHex() throws IOException {
-        byte cel = in.peekByte();
-        if (cel == CEL_BYTE_UPHEX || cel == CEL_BYTE_LWHEX) {
-            // hex value
-            in.readByte();
-            byte highHex = Util.toLowerCase(in.readByte());
-            byte lowHex = Util.toLowerCase(in.readByte());
-            if (!Util.isHexAscii(highHex) || !Util.isHexAscii(lowHex)) {
-                throw new IOException();
-            }
-
-            highHex = Util.toHexValue(highHex);
-            lowHex = Util.toHexValue(lowHex);
-
-            byte hex = (byte) (lowHex + highHex << 4);
-            buf.add(hex);
-        } else {
-            // octet value
-            byte high = in.readHex();
-            if (!Util.isDigit(high) && !(high >= CEL_OCTET_ZERO && high <= CEL_OCTET_THREE)) {
-                throw new IOException();
-            }
-            byte mid = in.readHex();
-            if (!Util.isDigit(mid) && !(high >= CEL_OCTET_ZERO && high <= CEL_OCTET_SEVEN)) {
-                throw new IOException();
-            }
-            byte low = in.readHex();
-            if (!Util.isDigit(low) && !(high >= CEL_OCTET_ZERO && high <= CEL_OCTET_SEVEN)) {
-                throw new IOException();
-            }
-            byte hex = (byte) (low - CEL_OCTET_ZERO + (mid - CEL_OCTET_ZERO) << 3 + (high - CEL_OCTET_SEVEN) << 6);
-            buf.add(hex);
+        // hex value
+        in.readByte();
+        byte highHex = Util.toLowerCase(in.readByte());
+        byte lowHex = Util.toLowerCase(in.readByte());
+        if (!Util.isHexAscii(highHex) || !Util.isHexAscii(lowHex)) {
+            throw new IOException();
         }
+
+        highHex = Util.toHexValue(highHex);
+        lowHex = Util.toHexValue(lowHex);
+
+        byte hex = (byte) (lowHex + (highHex << 4));
+        buf.add(hex);
+    }
+
+    private void readOctet() throws IOException {
+        // octet value
+        byte high = in.readByte();
+        if (!Util.isDigit(high) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_THREE)) {
+            throw new IOException();
+        }
+        byte mid = in.readByte();
+        if (!Util.isDigit(mid) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_SEVEN)) {
+            throw new IOException();
+        }
+        byte low = in.readByte();
+        if (!Util.isDigit(low) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_SEVEN)) {
+            throw new IOException();
+        }
+        byte hex = (byte) (low - CEL_BYTE_ZERO + ((mid - CEL_BYTE_ZERO) << 3) + ((high - CEL_BYTE_SEVEN) << 6));
+        buf.add(hex);
+    }
+
+    private void readSlash() throws IOException {
+        in.readByte();
+        byte cel = in.peekByte();
+        switch (cel) {
+            case CEL_BYTE_UP_X:
+            case CEL_BYTE_LOW_X:
+                readHex();
+                break;
+            case CEL_BYTE_QUOTE:
+                in.readByte();
+                buf.add(CEL_BYTE_QUOTE);
+                break;
+            case CEL_BYTE_QUESTION:
+                in.readByte();
+                buf.add(CEL_BYTE_QUESTION);
+                break;
+            case CEL_BYTE_SINGLE_QUOTE:
+                in.readByte();
+                buf.add(CEL_BYTE_SINGLE_QUOTE);
+                break;
+            case CEL_BYTE_BACKTICK:
+                in.readByte();
+                buf.add(CEL_BYTE_BACKTICK);
+                break;
+            case CEL_BYTE_LOW_A:
+                in.readByte();
+                buf.add((byte)0x07);
+                break;
+            case CEL_BYTE_LOW_B:
+                in.readByte();
+                buf.add((byte)0x08);
+                break;
+            case CEL_BYTE_LOW_R:
+                in.readByte();
+                buf.add((byte)0x0d);
+                break;
+            case CEL_BYTE_LOW_F:
+                in.readByte();
+                buf.add((byte)0x0c);
+                break;
+            case CEL_BYTE_LOW_N:
+                in.readByte();
+                buf.add((byte)0x0a);
+                break;
+            case CEL_BYTE_T:
+                in.readByte();
+                buf.add((byte)0x09);
+                break;
+            case CEL_BYTE_V:
+                in.readByte();
+                buf.add((byte)0x0b);
+                break;
+            default:
+                readOctet();
+                break;
+        }
+
     }
 
     private void readAscii() throws IOException {
@@ -128,19 +164,6 @@ public class CelBytesInputStream extends InputStream {
             throw new IOException();
         }
         buf.add(cel);
-    }
-
-    /**
-     * Peeks at (but does not consume) and returns the next byte value in
-     * the stream, or throws EOFException if end of stream/block data has
-     * been reached.
-     */
-    byte peekByte() throws IOException {
-        int val = in.peek();
-        if (val < 0) {
-            throw new EOFException();
-        }
-        return (byte) val;
     }
 
     @Override
@@ -265,9 +288,6 @@ public class CelBytesInputStream extends InputStream {
             return (byte)(ch);
         }
 
-        public final byte readHex() throws IOException {
-            return 0x00;
-        }
     }
 
 
