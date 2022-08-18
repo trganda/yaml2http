@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.trganda</groupId>
-    <artifactId>extender</artifactId>
+    <artifactId>yaml2http</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -26,11 +26,12 @@
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>2.13.3</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/ognl/ognl -->
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
-            <groupId>ognl</groupId>
-            <artifactId>ognl</artifactId>
-            <version>3.3.3</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

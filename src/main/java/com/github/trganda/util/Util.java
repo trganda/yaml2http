@@ -1,5 +1,8 @@
 package com.github.trganda.util;
 
+import static com.github.trganda.util.CelBytesInputStream.CEL_ASCII_LOWA;
+import static com.github.trganda.util.CelBytesInputStream.CEL_OCTET_ZERO;
+
 public class Util {
 
     public static String hex2Unicode(String expression) {
@@ -25,6 +28,71 @@ public class Util {
         }
 
         return bytes;
+    }
+
+    public static boolean isAsciiByte(byte ascii) {
+        return ascii >= 0x00;
+    }
+
+    public static boolean isDigit(byte ascii) {
+        return (ascii >= 0x30 && ascii <= 0x39);
+    }
+
+    public static boolean isLetter(byte ascii) {
+        return isUpperCase(ascii) || isLowerCase(ascii);
+    }
+
+    public static boolean isHexAscii(byte ascii) {
+        ascii = Util.toLowerCase(ascii);
+        return Util.isDigit(ascii) || (Util.isLowerCase(ascii) && ascii <= 0x66);
+    }
+
+    public static byte toHexValue(byte ascii) {
+        if (Util.isHexAscii(ascii)) {
+            if (Util.isDigit(ascii)) {
+                ascii = (byte) (ascii - CEL_OCTET_ZERO);
+            } else {
+                ascii = (byte) (ascii - CEL_ASCII_LOWA);
+            }
+            return ascii;
+        }
+        return ascii;
+    }
+
+    public static boolean isUpperCase(byte ascii) {
+        return (ascii >= 0x41 && ascii <= 0x5A);
+    }
+
+    public static boolean isLowerCase(byte ascii) {
+        return (ascii >= 0x61 && ascii <= 0x7A);
+    }
+
+    public static byte toUpperCase(byte ascii) {
+        if (isUpperCase(ascii)) {
+            return ascii;
+        } else if (isLowerCase(ascii)) {
+            return (byte)(ascii - 0x20);
+        }
+
+        return ascii;
+    }
+
+    public static byte toLowerCase(byte ascii) {
+        if (isLowerCase(ascii)) {
+            return ascii;
+        } else if (isUpperCase(ascii)) {
+            return (byte)(ascii + 0x20);
+        }
+
+        return ascii;
+    }
+
+    public static char byte2char(byte ascii) throws IllegalArgumentException {
+        if (isLetter(ascii)) {
+            return (char) ascii;
+        } else {
+            throw new IllegalArgumentException("The arg was not a valid ascii byte.");
+        }
     }
 
 }
