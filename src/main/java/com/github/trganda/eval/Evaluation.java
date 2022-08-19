@@ -36,6 +36,10 @@ public class Evaluation {
         return parser.parseExpression(expression).getValue(context, "", String.class);
     }
 
+    public <T> T  eval(String expression, Class<T> desiredResultType) {
+        return parser.parseExpression(expression).getValue(context, "", desiredResultType);
+    }
+
     /**
      * Eval each value of sets with spel.
      * @param sets, the variable that need to be eval.

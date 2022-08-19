@@ -1,5 +1,6 @@
 package com.github.trganda.util;
 
+import com.github.trganda.eval.Evaluation;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -17,7 +18,8 @@ public class CelByteInputStreamTest {
         CelBytesInputStream celBytesInputStream = new CelBytesInputStream(bis);
         celBytesInputStream.readCelBytes();
 
-        byte[] ret = Util.getBytes(celBytesInputStream.getBufString());
+        Evaluation evaluation = new Evaluation();
+        byte[] ret = evaluation.eval(celBytesInputStream.getBufString(), byte[].class);
         assert want.length == ret.length;
         for (int i = 0; i < want.length; i++) {
             assert want[i] == ret[i];

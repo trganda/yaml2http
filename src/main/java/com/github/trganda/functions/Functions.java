@@ -16,12 +16,19 @@ public abstract class Functions {
     }
 
     public static String base64(String input) {
-        return new String(Base64.getEncoder().encode(Util.getBytes(input)));
+        return new String(Base64.getEncoder().encode(input.getBytes(StandardCharsets.UTF_8)));
     }
 
     public static String md5(String input) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(Util.getBytes(input));
+        md.update(input.getBytes(StandardCharsets.UTF_8));
+
+        return new BigInteger(1, md.digest()).toString(16);
+    }
+
+    public static String md5(byte[] bytes) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(bytes);
 
         return new BigInteger(1, md.digest()).toString(16);
     }

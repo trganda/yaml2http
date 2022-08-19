@@ -4,8 +4,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 import static com.github.trganda.util.CelBytesConstants.*;
 
@@ -60,10 +58,6 @@ public class CelBytesInputStream extends InputStream {
                     break;
             }
         }
-        // add a flag to identify this is a processed cel bytes array
-        for (byte magic : CEL_BYTE_MAGIC) {
-            buf.add(magic);
-        }
     }
 
     /**
@@ -83,7 +77,17 @@ public class CelBytesInputStream extends InputStream {
      * @return String format byte array.
      */
     public String getBufString() {
-        return Util.bytes2String(getByteBuf());
+        byte[] bytes = getByteBuf();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("new byte[]{");
+        for (byte b : bytes) {
+            sb.append(b).append(",");
+        }
+        sb.deleteCharAt(sb.lastIndexOf(","));
+        sb.append("}");
+
+        return sb.toString();
     }
 
     /**
