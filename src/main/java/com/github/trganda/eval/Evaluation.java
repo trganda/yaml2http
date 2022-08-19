@@ -3,7 +3,6 @@ package com.github.trganda.eval;
 import com.github.trganda.functions.GlobalMethodResolver;
 import com.github.trganda.pocs.Sets;
 import com.github.trganda.util.CelBytesInputStream;
-import com.github.trganda.util.Util;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -72,7 +71,7 @@ public class Evaluation {
 
             try {
                 CelBytesInputStream celBytesInputStream = new CelBytesInputStream(bis);
-                celBytesInputStream.process();
+                celBytesInputStream.readCelBytes();
 
                 expression = expression.replace(matcher.group(0), celBytesInputStream.getBufString());
                 matcher_start = matcher.end();

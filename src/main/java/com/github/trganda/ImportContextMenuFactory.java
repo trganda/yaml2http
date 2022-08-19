@@ -24,7 +24,7 @@ public class ImportContextMenuFactory implements IContextMenuFactory {
         List<JMenuItem> menus = new ArrayList<>();
         if (invocation.getToolFlag() == TOOL_REPEATER) {
 
-            JMenuItem jMenuItem = new JMenuItem("Import Poc(Yam Format)", null);
+            JMenuItem jMenuItem = new JMenuItem("Import Poc(Yaml Format)", null);
             jMenuItem.setActionCommand("import");
             jMenuItem.addActionListener(new ImportActionListener(callbacks));
 

@@ -17,7 +17,7 @@ import static com.github.trganda.parser.HttpRequest.defaultHeader;
 
 public class PocsParser {
 
-    private File file;
+    private final File file;
     private ObjectMapper mapper;
 
     public PocsParser(File file) {

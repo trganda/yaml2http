@@ -92,4 +92,5 @@ public interface CelBytesConstants {
      */
     final static byte CEL_BYTE_SEVEN = (byte)0x37;
 
+    final static byte[] CEL_BYTE_MAGIC = new byte[]{(byte) 0xac, (byte) 0xed, (byte) 0x40, (byte) 0x54};
 }

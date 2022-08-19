@@ -1,7 +1,8 @@
 package com.github.trganda.util;
 
-import static com.github.trganda.util.CelBytesConstants.CEL_BYTE_LOW_A;
-import static com.github.trganda.util.CelBytesConstants.CEL_BYTE_ZERO;
+import java.nio.charset.StandardCharsets;
+
+import static com.github.trganda.util.CelBytesConstants.*;
 
 public class Util {
 
@@ -23,11 +24,33 @@ public class Util {
         char[] buffer = expression.toCharArray();
         byte[] bytes = new byte[buffer.length];
 
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte)(buffer[i] & 0x00FF);
+        int length = bytes.length;
+        int magicLength = CEL_BYTE_MAGIC.length;
+        if (length < magicLength) {
+            return expression.getBytes(StandardCharsets.UTF_8);
         }
 
-        return bytes;
+        byte[] trueBytes = new byte[length - magicLength];
+
+        for (int i = 0; i < length; i++) {
+            bytes[i] = (byte) (buffer[i] & 0x00FF);
+            if (i < length - magicLength)
+                trueBytes[i] = bytes[i];
+        }
+
+        boolean ended = false;
+        for (int i = 0; i < magicLength; i++) {
+            if (bytes[length - magicLength + i] != CEL_BYTE_MAGIC[i]) {
+                ended = true;
+                break;
+            }
+        }
+
+        if (ended) {
+            return expression.getBytes(StandardCharsets.UTF_8);
+        } else {
+            return trueBytes;
+        }
     }
 
     public static String bytes2String(byte[] bytes) {

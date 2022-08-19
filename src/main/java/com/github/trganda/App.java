@@ -11,7 +11,7 @@ import java.util.List;
 public class App {
 
     public static void main(String[] args) throws IOException {
-        PocsParser parser = new PocsParser(new File(App.class.getClassLoader().getResource("a.yaml").getPath()));
+        PocsParser parser = new PocsParser(new File(App.class.getClassLoader().getResource("poc-yaml-yonyou-nc-arbitrary-file-upload.yaml").getPath()));
 
         Pocs pocs = parser.readPocs();
         List<HttpRequest> httpRequestList = parser.toHttpRequests(pocs);

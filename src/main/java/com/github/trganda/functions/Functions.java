@@ -22,8 +22,7 @@ public abstract class Functions {
     public static String md5(String input) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(Util.getBytes(input));
-        String hash= new BigInteger(1, md.digest()).toString(16);
 
-        return hash;
+        return new BigInteger(1, md.digest()).toString(16);
     }
 }

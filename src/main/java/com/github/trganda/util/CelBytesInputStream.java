@@ -3,8 +3,9 @@ package com.github.trganda.util;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static com.github.trganda.util.CelBytesConstants.*;
 
@@ -23,35 +24,52 @@ public class CelBytesInputStream extends InputStream {
         this.in = new PeekInputStream(in);
     }
 
-    public void process() throws IllegalArgumentException, IOException {
+    /**
+     * Read the cel bytes value from underling InputStream.
+     * @throws IOException
+     */
+    public void readCelBytes() throws IOException {
 
+        // start character 'b'
         byte cel = in.readByte();
         if (cel != CEL_BYTE_START) {
             throw new IOException();
         }
+        // the first quote '"'
         cel = in.readByte();
-        if (cel != CEL_BYTE_QUOTE) {
+        if (cel != CEL_BYTE_QUOTE && cel != CEL_BYTE_SINGLE_QUOTE) {
             throw new IOException();
         }
 
         buf.add(cel);
-        while (in.available() > 0) {
+        boolean ended = false;
+        while (in.available() > 0 && !ended) {
             cel = in.peekByte();
             switch (cel) {
                 case CEL_BYTE_SLASH:
                     readSlash();
                     break;
                 case CEL_BYTE_QUOTE:
+                case CEL_BYTE_SINGLE_QUOTE:
                     cel = in.readByte();
                     buf.add(cel);
+                    ended = true;
                     break;
                 default:
                     readAscii();
                     break;
             }
         }
+        // add a flag to identify this is a processed cel bytes array
+        for (byte magic : CEL_BYTE_MAGIC) {
+            buf.add(magic);
+        }
     }
 
+    /**
+     * Get the underling byte array.
+     * @return underling read bytes.
+     */
     public byte[] getByteBuf() {
         byte[] ret = new byte[buf.size()];
         for (int i = 0; i < ret.length; i++) {
@@ -60,11 +78,18 @@ public class CelBytesInputStream extends InputStream {
         return ret;
     }
 
+    /**
+     * Get a String format of underling read byte array.
+     * @return String format byte array.
+     */
     public String getBufString() {
-        byte[] bytes = getByteBuf();
-        return Util.bytes2String(bytes);
+        return Util.bytes2String(getByteBuf());
     }
 
+    /**
+     * Read a hex value with the format \xaa
+     * @throws IOException
+     */
     private void readHex() throws IOException {
         // hex value
         in.readByte();
@@ -81,6 +106,10 @@ public class CelBytesInputStream extends InputStream {
         buf.add(hex);
     }
 
+    /**
+     * Read an octet value wiht the format \000
+     * @throws IOException
+     */
     private void readOctet() throws IOException {
         // octet value
         byte high = in.readByte();
@@ -99,6 +128,10 @@ public class CelBytesInputStream extends InputStream {
         buf.add(hex);
     }
 
+    /**
+     * Read an escape value that was start with \
+     * @throws IOException
+     */
     private void readSlash() throws IOException {
         in.readByte();
         byte cel = in.peekByte();
@@ -158,6 +191,10 @@ public class CelBytesInputStream extends InputStream {
 
     }
 
+    /**
+     * Read a ascii value between 0x00-0x7F
+     * @throws IOException
+     */
     private void readAscii() throws IOException {
         byte cel = in.readByte();
         if (!Util.isAsciiByte(cel)) {
@@ -289,6 +326,5 @@ public class CelBytesInputStream extends InputStream {
         }
 
     }
-
 
 }
