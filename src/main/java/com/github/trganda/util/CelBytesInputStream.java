@@ -39,7 +39,6 @@ public class CelBytesInputStream extends InputStream {
             throw new IOException();
         }
 
-        buf.add(cel);
         boolean ended = false;
         while (in.available() > 0 && !ended) {
             cel = in.peekByte();
@@ -49,8 +48,7 @@ public class CelBytesInputStream extends InputStream {
                     break;
                 case CEL_BYTE_QUOTE:
                 case CEL_BYTE_SINGLE_QUOTE:
-                    cel = in.readByte();
-                    buf.add(cel);
+                    in.readByte();
                     ended = true;
                     break;
                 default:
