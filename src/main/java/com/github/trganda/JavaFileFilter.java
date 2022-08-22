@@ -10,6 +10,11 @@ class JavaFileFilter extends FileFilter {
         this.ext = ext;
     }
 
+    /**
+     * Accept yaml or yml file。
+     * @param file file object.
+     * @return true if file is a directory or accept the file extension with .yaml/.yml
+     */
     public boolean accept(File file) {
         if (file.isDirectory()) {
             return true;
