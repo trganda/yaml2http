@@ -1,6 +1,7 @@
 package com.github.trganda.util;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static com.github.trganda.util.CelBytesConstants.*;
 
@@ -125,6 +126,12 @@ public class Util {
             return (char) ascii;
         } else {
             throw new IllegalArgumentException("The arg was not a valid ascii byte.");
+        }
+    }
+
+    public static void addAll(List<Byte> list, byte[] bytes) {
+        for (byte bt : bytes) {
+            list.add(bt);
         }
     }
 

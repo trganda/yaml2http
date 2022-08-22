@@ -1,8 +1,9 @@
 package com.github.trganda.parser;
 
-import java.util.AbstractMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.github.trganda.util.Util;
+
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,34 +27,62 @@ public final class HttpRequest {
                     collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
     private final String method;
-    private final String uri;
+    private final byte[] uri;
     private final String version;
     private final Map<String, String> headers;
-    private final String body;
+    private final byte[] body;
+    private byte[] total;
 
-    public HttpRequest(String method, String uri,
-                       String version, Map<String, String> headers, String body) {
+    public HttpRequest(String method, byte[] uri,
+                       String version, Map<String, String> headers, byte[] body) {
         this.method = method;
         this.uri = uri;
         this.version = version;
         this.headers = headers;
         this.body = body;
+        total = new byte[0];
     }
 
     @Override
     public String toString() {
-
         StringBuilder requestString = new StringBuilder();
-        requestString.append(method).append(" ").append(uri).append(" HTTP/").append(version).append("\n");
+        requestString.append(method).append(" ").append(new String(uri)).append(" HTTP/").append(version).append("\n");
         for (Map.Entry<String, String> header : headers.entrySet()) {
             requestString.append(header.getKey()).append(": ").append(header.getValue()).append("\n");
         }
         requestString.append("\n");
-        if (body != null && !body.isEmpty()) {
-            requestString.append(body).append("\n");
+        if (body != null) {
+            requestString.append(new String(body)).append("\n");
         }
         requestString.append("\n");
 
         return requestString.toString();
+    }
+
+    private void toBytes() {
+        List<Byte> bytes = new LinkedList<>();
+
+        Util.addAll(bytes, (method + " ").getBytes(StandardCharsets.UTF_8));
+        Util.addAll(bytes, uri);
+        Util.addAll(bytes, (" HTTP/" + version + "\r\n").getBytes(StandardCharsets.UTF_8));
+
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            Util.addAll(bytes, (header.getKey() + ": " + header.getValue() + "\r\n").getBytes(StandardCharsets.UTF_8));
+        }
+
+        Util.addAll(bytes, "\r\n".getBytes(StandardCharsets.UTF_8));
+        if (body != null && body.length > 0) {
+            Util.addAll(bytes, body);
+        }
+
+        total = new byte[bytes.size()];
+        for (int i = 0; i < total.length; i++) {
+            total[i] = bytes.get(i);
+        }
+    }
+
+    public byte[] getTotal() {
+        toBytes();
+        return total;
     }
 }

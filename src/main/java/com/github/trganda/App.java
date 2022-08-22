@@ -19,6 +19,5 @@ public class App {
         for (HttpRequest httpRequest : httpRequestList) {
             System.out.println(httpRequest);
         }
-
     }
 }

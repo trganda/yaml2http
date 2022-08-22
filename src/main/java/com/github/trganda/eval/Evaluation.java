@@ -32,8 +32,8 @@ public class Evaluation {
         builder.withMethodResolvers(new GlobalMethodResolver());
     }
 
-    public String eval(String expression) {
-        return parser.parseExpression(expression).getValue(context, "", String.class);
+    public Object eval(String expression) {
+        return parser.parseExpression(expression).getValue(context, "");
     }
 
     public <T> T  eval(String expression, Class<T> desiredResultType) {
@@ -45,17 +45,18 @@ public class Evaluation {
      * @param sets, the variable that need to be eval.
      * @return evaluated result.
      */
-    public Map<String, String> evalSet(Sets sets) {
+    public Map<String, Object> evalSet(Sets sets) {
 
-        Map<String, String> ret = new LinkedHashMap<>();
+        Map<String, Object> val = new LinkedHashMap<>();
 
         for (Map.Entry<String, String> entry : sets.setItem.entrySet()) {
             String key = entry.getKey();
             String value = prepare(entry.getValue());
-            ret.put(key, eval(value));
+
+            val.put(key, eval(value));
         }
 
-        return ret;
+        return val;
     }
 
     /**

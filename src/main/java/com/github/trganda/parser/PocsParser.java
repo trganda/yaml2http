@@ -8,10 +8,10 @@ import com.github.trganda.pocs.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.github.trganda.parser.HttpRequest.defaultHeader;
 
@@ -46,29 +46,42 @@ public class PocsParser {
         }
 
         Evaluation evaluation = new Evaluation();
-        Map<String, String> valMap = evaluation.evalSet(pocs.set);
+        Map<String, Object> valMap = evaluation.evalSet(pocs.set);
 
         List<HttpRequest> httpRequests = new ArrayList<>();
 
         for (Map.Entry<String, Rules.RuleItem> ruleItemEntry : pocs.rules.rules.entrySet()) {
             Rules.Request req = ruleItemEntry.getValue().request;
             Map<String, String> theader = defaultHeader;
-            // For each set variable value
-            for (Map.Entry<String, String> val : valMap.entrySet()) {
-                req.path = req.path.replaceAll("\\{\\{" + val.getKey() + "}}", val.getValue());
-                req.body = req.body.replaceAll("\\{\\{" + val.getKey() + "}}", val.getValue());
 
-                if (req.headers == null) {
-                    continue;
-                }
+            /*
+             * For each set variable value
+             * Step:
+             *     * replace all string variable
+             *     * process byte type variable and convert them with string variable to byte array
+             */
+            for (Map.Entry<String, Object> val : valMap.entrySet()) {
+                if (val.getValue() instanceof String) {
+                    String stringVal = (String) val.getValue();
 
-                for (Map.Entry<String, String> header : req.headers.entrySet()) {
-                    if (!header.getValue().contains("{{" + val.getKey() + "}}")) {
+                    req.path = req.path.replaceAll("\\{\\{" + val.getKey() + "}}", stringVal);
+                    req.body = req.body.replaceAll("\\{\\{" + val.getKey() + "}}", stringVal);
+
+                    if (req.headers == null) {
                         continue;
                     }
-                    header.setValue(header.getValue().replaceAll("\\{\\{" + val.getKey() + "}}", val.getValue()));
+
+                    for (Map.Entry<String, String> header : req.headers.entrySet()) {
+                        if (!header.getValue().contains("{{" + val.getKey() + "}}")) {
+                            continue;
+                        }
+                        header.setValue(header.getValue().replaceAll("\\{\\{" + val.getKey() + "}}", stringVal));
+                    }
                 }
             }
+
+            byte[] path = toBytes(req.path, valMap);
+            byte[] body = toBytes(req.body, valMap);
 
             assert req.headers != null;
             if (Objects.equals(req.method, "POST") && (req.body != null || !req.body.isEmpty())) {
@@ -78,9 +91,53 @@ public class PocsParser {
 
             theader.putAll(req.headers);
             httpRequests.add(new HttpRequest(
-                    req.method, req.path, "1.1", theader, req.body));
+                    req.method, path, "1.1", theader, body));
         }
 
         return httpRequests;
+    }
+
+    private byte[] toBytes(String valueFor, Map<String, Object> valMap) {
+        String bStrPattern = "\\{\\{([\\w\\d]+)}}";
+        Pattern pattern = Pattern.compile(bStrPattern);
+        Matcher matcher = pattern.matcher(valueFor);
+
+        List<Byte> bytes = new LinkedList<>();
+
+        int matcher_start = 0;
+        int start_idx = 0;
+        int end_idx = 0;
+        while (matcher.find(matcher_start)){
+            end_idx = matcher.start(matcher_start);
+            byte[] b = valueFor.substring(start_idx, end_idx).getBytes(StandardCharsets.UTF_8);
+            start_idx = end_idx + matcher.group(0).length();
+            end_idx = start_idx;
+            for (byte bt : b) {
+                bytes.add(bt);
+            }
+
+            Object value = valMap.get(matcher.group(1));
+            if (value instanceof byte[]) {
+                for (byte bt : (byte[])value) {
+                    bytes.add(bt);
+                }
+            }
+
+            matcher_start = matcher.end();
+        }
+
+        if (end_idx < valueFor.length()) {
+            byte[] b = valueFor.substring(end_idx).getBytes(StandardCharsets.UTF_8);
+            for (byte bt : b) {
+                bytes.add(bt);
+            }
+        }
+
+        byte[] ret = new byte[bytes.size()];
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = bytes.get(i);
+        }
+
+        return ret;
     }
 }

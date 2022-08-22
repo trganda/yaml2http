@@ -38,7 +38,7 @@ public class ImportActionListener implements ActionListener {
 
                     for (HttpRequest httpRequest : httpRequestList) {
                         callbacks.sendToRepeater("localhost", 80, false,
-                                Util.getBytes(httpRequest.toString()), pocs.name);
+                                httpRequest.getTotal(), pocs.name);
                     }
 
 
