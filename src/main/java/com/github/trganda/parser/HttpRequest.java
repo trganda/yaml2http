@@ -45,18 +45,7 @@ public final class HttpRequest {
 
     @Override
     public String toString() {
-        StringBuilder requestString = new StringBuilder();
-        requestString.append(method).append(" ").append(new String(uri)).append(" HTTP/").append(version).append("\n");
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            requestString.append(header.getKey()).append(": ").append(header.getValue()).append("\n");
-        }
-        requestString.append("\n");
-        if (body != null) {
-            requestString.append(new String(body)).append("\n");
-        }
-        requestString.append("\n");
-
-        return requestString.toString();
+        return new String(getTotal(), StandardCharsets.UTF_8);
     }
 
     private void toBytes() {

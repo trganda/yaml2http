@@ -10,7 +10,7 @@ public class BurpExtender implements IBurpExtender
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks)
     {
         // set our extension name
-        callbacks.setExtensionName("Hello world extension");
+        callbacks.setExtensionName("Yaml Poc Loader");
 
         ImportContextMenuFactory menuFactory = new ImportContextMenuFactory(callbacks);
         callbacks.registerContextMenuFactory(menuFactory);
@@ -20,10 +20,7 @@ public class BurpExtender implements IBurpExtender
         PrintWriter stderr = new PrintWriter(callbacks.getStderr(), true);
 
         // write a message to our output stream
-        stdout.println("Hello output");
-
-        // write a message to our error stream
-        stderr.println("Hello errors");
+        stdout.println("Loaded Yaml Poc Loader");
 
         // write a message to the Burp alerts tab
         callbacks.issueAlert("Hello alerts");
