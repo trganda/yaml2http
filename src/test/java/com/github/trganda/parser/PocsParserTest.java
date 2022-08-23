@@ -13,7 +13,7 @@ public class PocsParserTest {
     public void toBytesTest() throws IOException {
         PocsParser parser = new PocsParser(new File(
                 App.class.getClassLoader().getResource(
-                        "poc-yaml-yonyou-nc-arbitrary-file-upload.yaml").getPath()));
+                        "yamlpocs/poc-yaml-yonyou-nc-arbitrary-file-upload.yaml").getPath()));
 
         Pocs pocs = parser.readPocs();
         List<HttpRequest> httpRequestList = parser.toHttpRequests(pocs);
