@@ -34,9 +34,15 @@ bsh.script=print%2842503*40455%29&bsh.servlet.captureOutErr=true&bsh.servlet.out
 
 使用方式，从`Extender`导入下载或编译的`jar`包
 
+![](images/20220823113410.png)
+
 进入`Repeater`页面，鼠标右键打开菜单并选择`Extension -> Yaml Poc Loader -> Import`，并选择需要载入的文件
 
-加载完成后如下
+![](images/20220823113616.png)
+
+加载完成后如下，默认指定`localhost:80`作为目标。
+
+![](images/20220823113627.png)
 
 ## Todo
 
