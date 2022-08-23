@@ -12,14 +12,13 @@ public class PocsParserTest {
     @Test
     public void toBytesTest() throws IOException {
         PocsParser parser = new PocsParser(new File(
-                App.class.getClassLoader().getResource(
-                        "poc-yaml-yonyou-nc-arbitrary-file-upload.yaml").getPath()));
+                        "yamlpocs/poc-yaml-ecology9-beanshell-rce.yaml"));
 
         Pocs pocs = parser.readPocs();
         List<HttpRequest> httpRequestList = parser.toHttpRequests(pocs);
 
         for (HttpRequest httpRequest : httpRequestList) {
-            System.out.println(httpRequest.getTotal());
+            System.out.println(httpRequest.toString());
         }
     }
 }
