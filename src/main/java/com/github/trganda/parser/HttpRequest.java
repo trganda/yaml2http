@@ -71,6 +71,8 @@ public final class HttpRequest {
     }
 
     public byte[] getTotal() {
+        if (total.length > 0)
+            return total;
         toBytes();
         return total;
     }

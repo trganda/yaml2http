@@ -85,9 +85,8 @@ public class PocsParser {
             byte[] body = toBytes(req.body, valMap);
 
             assert req.headers != null;
-            if (Objects.equals(req.method, "POST") && (req.body != null || !req.body.isEmpty())) {
-                long contentLength = req.body.length();
-                req.headers.put("Content-Length", String.valueOf(contentLength));
+            if (Objects.equals(req.method, "POST")) {
+                req.headers.put("Content-Length", String.valueOf(body.length));
             }
 
             theader.putAll(req.headers);
