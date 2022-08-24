@@ -20,7 +20,7 @@ public class ImportActionListener implements ActionListener {
 
     public ImportActionListener(IBurpExtenderCallbacks callbacks) {
         this.callbacks = callbacks;
-        this.last = null;
+        this.last = new File(System.getProperty("user.dir"));
 
         chooser = new JFileChooser();
         chooser.addChoosableFileFilter(new JavaFileFilter("yaml"));
@@ -32,7 +32,7 @@ public class ImportActionListener implements ActionListener {
         if (Objects.equals(e.getActionCommand(), "import")) {
             if (last != null)
                 chooser.setCurrentDirectory(last);
-            chooser.showOpenDialog(chooser);
+            chooser.showOpenDialog(null);
             File file = chooser.getSelectedFile().getAbsoluteFile();
             if (file.exists() && file.isFile()) {
                 last = file.getParentFile();

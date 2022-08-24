@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.trganda.parser.HttpRequest.defaultHeader;
+import static java.util.regex.Pattern.MULTILINE;
 
 public class PocsParser {
 
@@ -99,7 +100,7 @@ public class PocsParser {
 
     private byte[] toBytes(String valueFor, Map<String, Object> valMap) {
         String bStrPattern = "\\{\\{([\\w\\d]+)}}";
-        Pattern pattern = Pattern.compile(bStrPattern);
+        Pattern pattern = Pattern.compile(bStrPattern, MULTILINE);
         Matcher matcher = pattern.matcher(valueFor);
 
         List<Byte> bytes = new LinkedList<>();
@@ -108,7 +109,7 @@ public class PocsParser {
         int start_idx = 0;
         int end_idx = 0;
         while (matcher.find(matcher_start)){
-            end_idx = matcher.start(matcher_start);
+            end_idx = matcher.start(0);
             byte[] b = valueFor.substring(start_idx, end_idx).getBytes(StandardCharsets.UTF_8);
             start_idx = end_idx + matcher.group(0).length();
             end_idx = start_idx;

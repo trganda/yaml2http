@@ -4,8 +4,12 @@ import com.github.trganda.eval.Evaluation;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
+import java.util.zip.ZipFile;
 
 public class CelByteInputStreamTest {
 
@@ -24,5 +28,30 @@ public class CelByteInputStreamTest {
         for (int i = 0; i < want.length; i++) {
             assert want[i] == ret[i];
         }
+    }
+
+    @Test
+    public void zipFileTest() throws IOException {
+        FileInputStream is = new FileInputStream("E:\\Downloads\\1.zip");
+
+        byte[] buf = new byte[is.available()];
+        is.read(buf);
+        String bytesValue = Util.toBytesValue(buf);
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytesValue.getBytes(StandardCharsets.UTF_8));
+
+        CelBytesInputStream celBytesInputStream = new CelBytesInputStream(bis);
+        celBytesInputStream.readCelBytes();
+
+        Evaluation evaluation = new Evaluation();
+        byte[] ret = evaluation.eval(celBytesInputStream.getBufString(), byte[].class);
+
+        FileOutputStream out = new FileOutputStream("E:\\Downloads\\2.zip");
+        out.write(ret);
+        out.close();
+
+        ZipFile zip = new ZipFile("E:\\Downloads\\2.zip");
+        Enumeration enumeration = zip.entries();
+
     }
 }

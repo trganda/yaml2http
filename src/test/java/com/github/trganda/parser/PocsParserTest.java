@@ -12,7 +12,7 @@ public class PocsParserTest {
     @Test
     public void toBytesTest() throws IOException {
         PocsParser parser = new PocsParser(new File(
-                        "yamlpocs/poc-yaml-ecology9-beanshell-rce.yaml"));
+                        "yamlpocs/poc-yaml-yonyou-nc-arbitrary-file-upload.yaml"));
 
         Pocs pocs = parser.readPocs();
         List<HttpRequest> httpRequestList = parser.toHttpRequests(pocs);
