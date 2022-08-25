@@ -136,7 +136,7 @@ public class Util {
         sb.append("b\"");
 
         for (byte bt : bytes) {
-            if (isLetter(bt) || isDigit(bt)) {
+            if (isPrintable(bt)) {
                 sb.append((char) bt);
             } else {
                 sb.append("\\x");

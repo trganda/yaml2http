@@ -111,15 +111,15 @@ public class CelBytesInputStream extends InputStream {
     private void readOctet() throws IOException {
         // octet value
         byte high = in.readByte();
-        if (!Util.isDigit(high) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_THREE)) {
+        if (!Util.isDigit(high) || !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_THREE)) {
             throw new IOException();
         }
         byte mid = in.readByte();
-        if (!Util.isDigit(mid) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_SEVEN)) {
+        if (!Util.isDigit(mid) || !(mid >= CEL_BYTE_ZERO && mid <= CEL_BYTE_SEVEN)) {
             throw new IOException();
         }
         byte low = in.readByte();
-        if (!Util.isDigit(low) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_SEVEN)) {
+        if (!Util.isDigit(low) || !(low >= CEL_BYTE_ZERO && low <= CEL_BYTE_SEVEN)) {
             throw new IOException();
         }
         byte hex = (byte) (low - CEL_BYTE_ZERO + ((mid - CEL_BYTE_ZERO) << 3) + ((high - CEL_BYTE_SEVEN) << 6));
@@ -153,6 +153,10 @@ public class CelBytesInputStream extends InputStream {
             case CEL_BYTE_BACKTICK:
                 in.readByte();
                 buf.write(CEL_BYTE_BACKTICK);
+                break;
+            case CEL_BYTE_SLASH:
+                in.readByte();
+                buf.write(CEL_BYTE_SLASH);
                 break;
             case CEL_BYTE_LOW_A:
                 in.readByte();
