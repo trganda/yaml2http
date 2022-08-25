@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 /**
  * type HttpRequest struct {
  * 	Method  string
- * 	URI     string
+ * 	URI     byte[]
  * 	Version string
  * 	Headers map[string]string
- * 	Body    string
+ * 	Body    byte[]
  * }
  */
 public final class HttpRequest {
