@@ -1,6 +1,8 @@
 package com.github.trganda;
 
 import burp.IBurpExtenderCallbacks;
+import burp.IHttpRequestResponse;
+import burp.IHttpService;
 import com.github.trganda.parser.HttpRequest;
 import com.github.trganda.parser.PocsParser;
 import com.github.trganda.pocs.Pocs;
@@ -15,27 +17,29 @@ import java.util.Objects;
 public class ImportActionListener implements ActionListener {
 
     private final IBurpExtenderCallbacks callbacks;
-    private final JFileChooser chooser;
     private File last;
 
     public ImportActionListener(IBurpExtenderCallbacks callbacks) {
         this.callbacks = callbacks;
-        this.last = new File(System.getProperty("user.dir"));
-
-        chooser = new JFileChooser();
-        chooser.addChoosableFileFilter(new JavaFileFilter("yaml"));
-        chooser.addChoosableFileFilter(new JavaFileFilter("yml"));
+        try {
+            this.last = new File(System.getProperty("last.import.dir"));
+        } catch (Exception ex) {
+            this.last = new File(System.getProperty("user.dir"));
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (Objects.equals(e.getActionCommand(), "import")) {
+            JFileChooser chooser = new JFileChooser();
+            chooser.addChoosableFileFilter(new JavaFileFilter("yaml"));
+            chooser.addChoosableFileFilter(new JavaFileFilter("yml"));
             if (last != null)
                 chooser.setCurrentDirectory(last);
             chooser.showOpenDialog(null);
             File file = chooser.getSelectedFile().getAbsoluteFile();
             if (file.exists() && file.isFile()) {
-                last = file.getParentFile();
+                System.setProperty("last.import.dir", file.getParent());
                 try {
                     PocsParser parser = new PocsParser(file);
                     Pocs pocs = parser.readPocs();
@@ -49,7 +53,7 @@ public class ImportActionListener implements ActionListener {
                     callbacks.issueAlert(ex.toString());
                 }
             } else if (file.isDirectory()) {
-                last = file;
+                System.setProperty("last.import.dir", file.getPath());
             }
         }
     }
