@@ -53,7 +53,7 @@ public class PocsParser {
 
         for (Map.Entry<String, Rules.RuleItem> ruleItemEntry : pocs.rules.rules.entrySet()) {
             Rules.Request req = ruleItemEntry.getValue().request;
-            Map<String, String> theader = defaultHeader;
+            Map<String, byte[]> headers = defaultHeader;
 
             /*
              * For each set variable value
@@ -84,14 +84,18 @@ public class PocsParser {
             byte[] path = toBytes(req.path, valMap);
             byte[] body = toBytes(req.body, valMap);
 
-            assert req.headers != null;
-            if (Objects.equals(req.method, "POST")) {
-                req.headers.put("Content-Length", String.valueOf(body.length));
+            if (req.headers != null) {
+                if (req.method.equals("POST")) {
+                    headers.put("Content-Length", String.valueOf(body.length).getBytes(StandardCharsets.UTF_8));
+                }
+
+                for (Map.Entry<String, String> header : req.headers.entrySet()) {
+                    headers.put(header.getKey(), toBytes(header.getValue(), valMap));
+                }
             }
 
-            theader.putAll(req.headers);
             httpRequests.add(new HttpRequest(
-                    req.method, path, "1.1", theader, body));
+                    req.method, path, "1.1", headers, body));
         }
 
         return httpRequests;
