@@ -49,6 +49,6 @@ bsh.script=print%2842503*40455%29&bsh.servlet.captureOutErr=true&bsh.servlet.out
 * [X] 完成`yaml`解析，读取已支持字段值
 * [X] 完成变量定义外的`http`文本转换
 * [X] 完成变量定义和表达式解析（已初步完成主体框架，后续补充方法功能即可）
-* [ ] 完成`Content-Type`自识别（但`body`数据过段会引起判断失误，推荐`poc`中自行指定）
+* [ ] 完成`Content-Type`自识别（但`body`数据过短会引起判断失误，推荐`poc`中自行指定）
 * [x] 完成变量定义字段其他方法的支持
 
