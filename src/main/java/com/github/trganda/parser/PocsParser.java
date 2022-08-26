@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.trganda.parser.HttpRequest.defaultHeader;
+import static java.util.regex.Pattern.MULTILINE;
 
 public class PocsParser {
 
@@ -52,7 +53,7 @@ public class PocsParser {
 
         for (Map.Entry<String, Rules.RuleItem> ruleItemEntry : pocs.rules.rules.entrySet()) {
             Rules.Request req = ruleItemEntry.getValue().request;
-            Map<String, String> theader = defaultHeader;
+            Map<String, byte[]> headers = defaultHeader;
 
             /*
              * For each set variable value
@@ -83,15 +84,18 @@ public class PocsParser {
             byte[] path = toBytes(req.path, valMap);
             byte[] body = toBytes(req.body, valMap);
 
-            assert req.headers != null;
-            if (Objects.equals(req.method, "POST") && (req.body != null || !req.body.isEmpty())) {
-                long contentLength = req.body.length();
-                req.headers.put("Content-Length", String.valueOf(contentLength));
+            if (req.headers != null) {
+                if (req.method.equals("POST")) {
+                    headers.put("Content-Length", String.valueOf(body.length).getBytes(StandardCharsets.UTF_8));
+                }
+
+                for (Map.Entry<String, String> header : req.headers.entrySet()) {
+                    headers.put(header.getKey(), toBytes(header.getValue(), valMap));
+                }
             }
 
-            theader.putAll(req.headers);
             httpRequests.add(new HttpRequest(
-                    req.method, path, "1.1", theader, body));
+                    req.method, path, "1.1", headers, body));
         }
 
         return httpRequests;
@@ -99,7 +103,7 @@ public class PocsParser {
 
     private byte[] toBytes(String valueFor, Map<String, Object> valMap) {
         String bStrPattern = "\\{\\{([\\w\\d]+)}}";
-        Pattern pattern = Pattern.compile(bStrPattern);
+        Pattern pattern = Pattern.compile(bStrPattern, MULTILINE);
         Matcher matcher = pattern.matcher(valueFor);
 
         List<Byte> bytes = new LinkedList<>();
@@ -108,7 +112,7 @@ public class PocsParser {
         int start_idx = 0;
         int end_idx = 0;
         while (matcher.find(matcher_start)){
-            end_idx = matcher.start(matcher_start);
+            end_idx = matcher.start(0);
             byte[] b = valueFor.substring(start_idx, end_idx).getBytes(StandardCharsets.UTF_8);
             start_idx = end_idx + matcher.group(0).length();
             end_idx = start_idx;

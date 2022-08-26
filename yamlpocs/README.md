@@ -99,7 +99,8 @@ expression: |
 
 ### Expression编写
 
-`expression`使用[Common Expression Language (CEL)](https://github.com/google/cel-spec)表达式语法，类似于`spel`或`ognl`，用于在`golang`中执行语句。
+`expression`使用[Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#expressions)表达式语法，
+这里由于使用`Java`开发，目前来讲所以无法使用谷歌的`CEL`，为此做了一部分的特殊处理以支持`CEL`中的某些语法。
 
 除了`cel`自带的函数，当前还支持以下函数
 

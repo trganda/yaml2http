@@ -48,6 +48,9 @@ public class Evaluation {
     public Map<String, Object> evalSet(Sets sets) {
 
         Map<String, Object> val = new LinkedHashMap<>();
+        if (sets == null) {
+            return val;
+        }
 
         for (Map.Entry<String, String> entry : sets.setItem.entrySet()) {
             String key = entry.getKey();

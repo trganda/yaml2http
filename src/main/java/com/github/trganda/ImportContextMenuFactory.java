@@ -12,7 +12,7 @@ import static burp.IBurpExtenderCallbacks.TOOL_REPEATER;
 
 public class ImportContextMenuFactory implements IContextMenuFactory {
 
-    private IBurpExtenderCallbacks callbacks;
+    private final IBurpExtenderCallbacks callbacks;
 
     public ImportContextMenuFactory(IBurpExtenderCallbacks callbacks) {
         this.callbacks = callbacks;

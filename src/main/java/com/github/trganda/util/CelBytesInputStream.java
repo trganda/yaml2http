@@ -1,9 +1,9 @@
 package com.github.trganda.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import static com.github.trganda.util.CelBytesConstants.*;
 
@@ -14,11 +14,11 @@ import static com.github.trganda.util.CelBytesConstants.*;
  */
 public class CelBytesInputStream extends InputStream {
 
-    private final ArrayList<Byte> buf;
+    private final ByteArrayOutputStream buf;
     private final PeekInputStream in;
 
     public CelBytesInputStream(InputStream in) {
-        buf = new ArrayList<>();
+        buf = new ByteArrayOutputStream();
         this.in = new PeekInputStream(in);
     }
 
@@ -63,11 +63,7 @@ public class CelBytesInputStream extends InputStream {
      * @return underling read bytes.
      */
     public byte[] getByteBuf() {
-        byte[] ret = new byte[buf.size()];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = buf.get(i);
-        }
-        return ret;
+        return buf.toByteArray();
     }
 
     /**
@@ -105,7 +101,7 @@ public class CelBytesInputStream extends InputStream {
         lowHex = Util.toHexValue(lowHex);
 
         byte hex = (byte) (lowHex + (highHex << 4));
-        buf.add(hex);
+        buf.write(hex);
     }
 
     /**
@@ -115,19 +111,19 @@ public class CelBytesInputStream extends InputStream {
     private void readOctet() throws IOException {
         // octet value
         byte high = in.readByte();
-        if (!Util.isDigit(high) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_THREE)) {
+        if (!Util.isDigit(high) || !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_THREE)) {
             throw new IOException();
         }
         byte mid = in.readByte();
-        if (!Util.isDigit(mid) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_SEVEN)) {
+        if (!Util.isDigit(mid) || !(mid >= CEL_BYTE_ZERO && mid <= CEL_BYTE_SEVEN)) {
             throw new IOException();
         }
         byte low = in.readByte();
-        if (!Util.isDigit(low) && !(high >= CEL_BYTE_ZERO && high <= CEL_BYTE_SEVEN)) {
+        if (!Util.isDigit(low) || !(low >= CEL_BYTE_ZERO && low <= CEL_BYTE_SEVEN)) {
             throw new IOException();
         }
         byte hex = (byte) (low - CEL_BYTE_ZERO + ((mid - CEL_BYTE_ZERO) << 3) + ((high - CEL_BYTE_SEVEN) << 6));
-        buf.add(hex);
+        buf.write(hex);
     }
 
     /**
@@ -144,47 +140,51 @@ public class CelBytesInputStream extends InputStream {
                 break;
             case CEL_BYTE_QUOTE:
                 in.readByte();
-                buf.add(CEL_BYTE_QUOTE);
+                buf.write(CEL_BYTE_QUOTE);
                 break;
             case CEL_BYTE_QUESTION:
                 in.readByte();
-                buf.add(CEL_BYTE_QUESTION);
+                buf.write(CEL_BYTE_QUESTION);
                 break;
             case CEL_BYTE_SINGLE_QUOTE:
                 in.readByte();
-                buf.add(CEL_BYTE_SINGLE_QUOTE);
+                buf.write(CEL_BYTE_SINGLE_QUOTE);
                 break;
             case CEL_BYTE_BACKTICK:
                 in.readByte();
-                buf.add(CEL_BYTE_BACKTICK);
+                buf.write(CEL_BYTE_BACKTICK);
+                break;
+            case CEL_BYTE_SLASH:
+                in.readByte();
+                buf.write(CEL_BYTE_SLASH);
                 break;
             case CEL_BYTE_LOW_A:
                 in.readByte();
-                buf.add((byte)0x07);
+                buf.write(0x07);
                 break;
             case CEL_BYTE_LOW_B:
                 in.readByte();
-                buf.add((byte)0x08);
+                buf.write(0x08);
                 break;
             case CEL_BYTE_LOW_R:
                 in.readByte();
-                buf.add((byte)0x0d);
+                buf.write(0x0d);
                 break;
             case CEL_BYTE_LOW_F:
                 in.readByte();
-                buf.add((byte)0x0c);
+                buf.write(0x0c);
                 break;
             case CEL_BYTE_LOW_N:
                 in.readByte();
-                buf.add((byte)0x0a);
+                buf.write(0x0a);
                 break;
             case CEL_BYTE_T:
                 in.readByte();
-                buf.add((byte)0x09);
+                buf.write(0x09);
                 break;
             case CEL_BYTE_V:
                 in.readByte();
-                buf.add((byte)0x0b);
+                buf.write(0x0b);
                 break;
             default:
                 readOctet();
@@ -202,7 +202,7 @@ public class CelBytesInputStream extends InputStream {
         if (!Util.isAsciiByte(cel)) {
             throw new IOException();
         }
-        buf.add(cel);
+        buf.write(cel);
     }
 
     @Override

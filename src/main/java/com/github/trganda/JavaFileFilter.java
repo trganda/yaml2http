@@ -11,7 +11,7 @@ class JavaFileFilter extends FileFilter {
     }
 
     /**
-     * Accept yaml or yml file。
+     * Accept yaml or yml file.
      * @param file file object.
      * @return true if file is a directory or accept the file extension with .yaml/.yml
      */

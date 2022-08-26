@@ -1,6 +1,5 @@
 package com.github.trganda.util;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static com.github.trganda.util.CelBytesConstants.*;
@@ -21,48 +20,6 @@ public class Util {
         return expression;
     }
 
-    public static byte[] getBytes(String expression) {
-        char[] buffer = expression.toCharArray();
-        byte[] bytes = new byte[buffer.length];
-
-        int length = bytes.length;
-        int magicLength = CEL_BYTE_MAGIC.length;
-        if (length < magicLength) {
-            return expression.getBytes(StandardCharsets.UTF_8);
-        }
-
-        byte[] trueBytes = new byte[length - magicLength];
-
-        for (int i = 0; i < length; i++) {
-            bytes[i] = (byte) (buffer[i] & 0x00FF);
-            if (i < length - magicLength)
-                trueBytes[i] = bytes[i];
-        }
-
-        boolean ended = false;
-        for (int i = 0; i < magicLength; i++) {
-            if (bytes[length - magicLength + i] != CEL_BYTE_MAGIC[i]) {
-                ended = true;
-                break;
-            }
-        }
-
-        if (ended) {
-            return expression.getBytes(StandardCharsets.UTF_8);
-        } else {
-            return trueBytes;
-        }
-    }
-
-    public static String bytes2String(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append((char)(b & 0x00FF));
-        }
-        return sb.toString();
-    }
-
-
     public static boolean isAsciiByte(byte ascii) {
         return ascii >= 0x00;
     }
@@ -76,14 +33,23 @@ public class Util {
     }
 
     public static boolean isHexAscii(byte ascii) {
-        ascii = Util.toLowerCase(ascii);
-        return Util.isDigit(ascii) || (Util.isLowerCase(ascii) && ascii <= 0x66);
+        ascii = toLowerCase(ascii);
+        return isDigit(ascii) || (isLowerCase(ascii) && ascii <= 0x66);
     }
 
+    public static boolean isPrintable(byte ascii) {
+        return ascii >= 0x20 && ascii <= 0x7E;
+    }
+
+    /**
+     * calc the ascii value to hex value, 0x61 (ascii 'a') to 0x0a (number)
+     * @param ascii input ascii
+     * @return byte number
+     */
     public static byte toHexValue(byte ascii) {
-        if (Util.isHexAscii(ascii)) {
-            ascii = Util.toLowerCase(ascii);
-            if (Util.isDigit(ascii)) {
+        if (isHexAscii(ascii)) {
+            ascii = toLowerCase(ascii);
+            if (isDigit(ascii)) {
                 ascii = (byte) (ascii - CEL_BYTE_ZERO);
             } else {
                 ascii = (byte) (ascii - CEL_BYTE_LOW_A + 10);
@@ -91,6 +57,23 @@ public class Util {
             return ascii;
         }
         return ascii;
+    }
+
+    /**
+     * Split the high 4 bit to ascii value and low 4 bit to another ascii value, 0x00 -> "00"
+     * @param hex input hex
+     * @return converted String.
+     */
+    public static String toHexString(byte hex) {
+        byte low = (byte)(hex & 0x0F);
+        byte high = (byte)((hex & 0xF0) >> 4);
+
+        String ret = "";
+
+        ret += String.valueOf(toChar(high));
+        ret += String.valueOf(toChar(low));
+
+        return ret;
     }
 
     public static boolean isUpperCase(byte ascii) {
@@ -121,11 +104,19 @@ public class Util {
         return ascii;
     }
 
-    public static char byte2char(byte ascii) throws IllegalArgumentException {
-        if (isLetter(ascii)) {
-            return (char) ascii;
+    /**
+     * hex byte to char, like 0x0a (hex number) -> 0x61 (ascii value)
+     * @param hex hex number
+     * @return ascii value
+     */
+    public static char toChar(byte hex) throws IllegalArgumentException {
+        if (!(0 <= hex && hex <= 0x0F))
+            throw new IllegalArgumentException("No expect hex value" + hex);
+
+        if (hex < 0x0a) {
+            return (char)(hex + CEL_BYTE_ZERO);
         } else {
-            throw new IllegalArgumentException("The arg was not a valid ascii byte.");
+            return (char)(hex - 0x0a + CEL_BYTE_LOW_A);
         }
     }
 
@@ -133,6 +124,28 @@ public class Util {
         for (byte bt : bytes) {
             list.add(bt);
         }
+    }
+
+    /**
+     * Convert a byte array to cel bytes value
+     * @param bytes byte array need to be convert
+     * @return a format string like b"...."
+     */
+    public static String toBytesValue(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("b\"");
+
+        for (byte bt : bytes) {
+            if (isPrintable(bt)) {
+                sb.append((char) bt);
+            } else {
+                sb.append("\\x");
+                sb.append(toHexString(bt));
+            }
+        }
+        sb.append("\"");
+
+        return sb.toString();
     }
 
 }

