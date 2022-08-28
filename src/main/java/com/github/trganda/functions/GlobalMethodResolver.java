@@ -21,6 +21,7 @@ public class GlobalMethodResolver extends ReflectiveMethodResolver {
                     Functions.class.getDeclaredMethod("urlencode", byte[].class),
                     Functions.class.getDeclaredMethod("urldecode", String.class),
                     Functions.class.getDeclaredMethod("urldecode", byte[].class),
+                    Functions.class.getDeclaredMethod("substr", String.class, int.class, int.class)
             };
         }
         catch (NoSuchMethodException ex) {

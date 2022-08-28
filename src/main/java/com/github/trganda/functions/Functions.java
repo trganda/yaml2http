@@ -79,4 +79,8 @@ public abstract class Functions {
         return cipher.doFinal(bytes);
     }
 
+     public static String substr(String input, int start, int length) {
+        return input.substring(start, start + length);
+     }
+
 }

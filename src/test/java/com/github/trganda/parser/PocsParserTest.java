@@ -11,14 +11,23 @@ import java.util.List;
 public class PocsParserTest {
     @Test
     public void toBytesTest() throws IOException {
-        PocsParser parser = new PocsParser(new File(
+        File dirs = new File("yamlpocs");
+        if (!dirs.exists() || !dirs.isDirectory()) {
+            throw new IllegalArgumentException();
+        }
+
+        for (File file : dirs.listFiles()) {
+            if (file.isFile() && file.getName().substring(file.getName().lastIndexOf(".") + 1).equals("yaml")) {
+                PocsParser parser = new PocsParser(new File(
                         "yamlpocs/poc-yaml-ecology9-getLabelByModule-sql-injection.yaml"));
 
-        Pocs pocs = parser.readPocs();
-        List<HttpRequest> httpRequestList = parser.toHttpRequests(pocs);
+                Pocs pocs = parser.readPocs();
+                List<HttpRequest> httpRequestList = parser.toHttpRequests(pocs);
 
-        for (HttpRequest httpRequest : httpRequestList) {
-            System.out.println(httpRequest.toString());
+                for (HttpRequest httpRequest : httpRequestList) {
+                    System.out.println(httpRequest.toString());
+                }
+            }
         }
     }
 }
