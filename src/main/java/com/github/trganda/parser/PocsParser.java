@@ -53,7 +53,7 @@ public class PocsParser {
 
         for (Map.Entry<String, Rules.RuleItem> ruleItemEntry : pocs.rules.rules.entrySet()) {
             Rules.Request req = ruleItemEntry.getValue().request;
-            Map<String, byte[]> headers = defaultHeader;
+            Map<String, byte[]> headers = new LinkedHashMap<>(defaultHeader);
 
             /*
              * For each set variable value

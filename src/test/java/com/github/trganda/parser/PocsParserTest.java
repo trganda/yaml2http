@@ -18,8 +18,7 @@ public class PocsParserTest {
 
         for (File file : dirs.listFiles()) {
             if (file.isFile() && file.getName().substring(file.getName().lastIndexOf(".") + 1).equals("yaml")) {
-                PocsParser parser = new PocsParser(new File(
-                        "yamlpocs/poc-yaml-ecology9-getLabelByModule-sql-injection.yaml"));
+                PocsParser parser = new PocsParser(file);
 
                 Pocs pocs = parser.readPocs();
                 List<HttpRequest> httpRequestList = parser.toHttpRequests(pocs);

