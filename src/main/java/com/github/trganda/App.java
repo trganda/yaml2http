@@ -16,8 +16,9 @@ public class App {
 
     public static void main(String[] args) throws IOException, ParseException {
         Options options = new Options();
+        options.addOption("h", "help", false, "Help info.");
         options.addOption("p", "path", true, "Path to poc file.");
-        options.addOption("b", "bytes", true, "Path ot file need convert.");
+        options.addOption("b", "bytes", true, "Path to file need to be convert, convert the file content as bytes value with b\"\" format.");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -40,6 +41,9 @@ public class App {
             is.read(buf);
 
             System.out.println(Util.toBytesValue(buf));
+        } else {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("yaml2http", options);
         }
 
     }

@@ -1,5 +1,6 @@
 package com.github.trganda.parser;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -35,6 +36,8 @@ public class PocsParser {
 
         mapper.registerModule(simpleModule);
         mapper.findAndRegisterModules();
+        // skip unknown field
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public Pocs readPocs() throws IOException {
@@ -53,7 +56,7 @@ public class PocsParser {
 
         for (Map.Entry<String, Rules.RuleItem> ruleItemEntry : pocs.rules.rules.entrySet()) {
             Rules.Request req = ruleItemEntry.getValue().request;
-            Map<String, byte[]> headers = defaultHeader;
+            Map<String, byte[]> headers = new LinkedHashMap<>(defaultHeader);
 
             /*
              * For each set variable value

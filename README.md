@@ -28,6 +28,17 @@ Content-Length: 87
 bsh.script=print%2842503*40455%29&bsh.servlet.captureOutErr=true&bsh.servlet.output=raw
 ```
 
+帮助信息
+
+```bash
+java -jar yaml2http-1.0.jar -h
+usage: yaml2http
+ -b,--bytes <arg>   Path to file need to be convert, convert the file
+                    content as bytes value with b"" format.
+ -h,--help          Help info.
+ -p,--path <arg>    Path to poc file.
+```
+
 ### Burp Suite Extension
 
 支持在`Burp Suite`中以插件形式进行使用，这种方式可以避免不可打印字符的问题。
@@ -43,6 +54,23 @@ bsh.script=print%2842503*40455%29&bsh.servlet.captureOutErr=true&bsh.servlet.out
 加载完成后如下，默认指定`localhost:80`作为目标。
 
 ![](images/20220823113627.png)
+
+## Build
+
+克隆源码到本地
+
+```bash
+git clone https://github.com/trganda/yaml2http
+```
+
+并执行
+
+```bash
+cd yaml2http
+mvn clean compile assembly:single
+```
+
+之后可在`target`目录下查看编译后的`jar`包文件
 
 ## Todo
 

