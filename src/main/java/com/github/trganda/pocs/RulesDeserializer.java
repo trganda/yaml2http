@@ -12,6 +12,14 @@ import java.io.IOException;
 import java.util.Map;
 
 public class RulesDeserializer extends JsonDeserializer<Rules> {
+
+    /**
+     * Customs reading multi-rules elements
+     * @param p Parsed used for reading JSON content
+     * @param ctxt Context that can be used to access information about
+     *   this deserialization activity.
+     * @return Constructed Rules object from read contents.
+     */
     @Override
     public Rules deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
 

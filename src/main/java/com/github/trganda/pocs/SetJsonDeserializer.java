@@ -13,6 +13,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SetJsonDeserializer extends JsonDeserializer<Sets> {
+
+    /**
+     * Customs reading multi-sets elements
+     * @param p Parsed used for reading JSON content
+     * @param ctxt Context that can be used to access information about
+     *   this deserialization activity.
+     * @return Constructed Sets object from read contents.
+     */
     @Override
     public Sets deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
         JavaType strType = ctxt.getTypeFactory().constructType(String.class);
