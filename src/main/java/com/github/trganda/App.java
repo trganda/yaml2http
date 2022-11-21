@@ -37,8 +37,12 @@ public class App {
             String path = cmd.getOptionValue("b");
             FileInputStream is = new FileInputStream(path);
 
-            byte[] buf = new byte[is.available()];
-            is.read(buf);
+            int size = is.available();
+            byte[] buf = new byte[size];
+            int readSize = is.read(buf);
+            if (readSize < 0 || readSize != size) {
+                return;
+            }
 
             System.out.println(Util.toBytesValue(buf));
         } else {

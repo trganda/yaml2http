@@ -136,11 +136,11 @@ public class Util {
         sb.append("b\"");
 
         for (byte bt : bytes) {
-            if (isPrintable(bt)) {
+            if (isPrintable(bt) && (bt != CEL_BYTE_QUOTE && bt != CEL_BYTE_SLASH && bt != CEL_BYTE_SINGLE_QUOTE)) {
                 sb.append((char) bt);
             } else {
                 sb.append("\\x");
-                sb.append(toHexString(bt));
+                sb.append(toHexString(bt).toUpperCase());
             }
         }
         sb.append("\"");
